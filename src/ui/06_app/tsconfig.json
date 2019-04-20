@@ -1,0 +1,19 @@
+{
+	"compilerOptions": {
+		"module": "es2015",
+		"moduleResolution": "node",
+		"target": "es5",
+		"noImplicitAny": false,
+		"sourceMap": true,
+		"experimentalDecorators": true,
+		"resolveJsonModule": true,
+		"strict": true,
+		"baseUrl": ".",
+		"paths": {
+			"*" : ["src/ui/interfaces/*"]
+		}
+	},
+	"exclude": [
+		"node_modules"
+	]
+}

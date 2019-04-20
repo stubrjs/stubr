@@ -1,0 +1,14 @@
+@import "~normalize.css/normalize.css";
+@import url('https://fonts.googleapis.com/css?family=Quicksand:300,400,500,700');
+@import url('https://fonts.googleapis.com/css?family=Anonymous+Pro');
+@import "vars";
+
+html, body {
+    font-family: 'Quicksand', 'Open Sans', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    background: $c-background;
+}
+
+* {
+    box-sizing: border-box;
+}

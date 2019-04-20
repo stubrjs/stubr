@@ -1,0 +1,15 @@
+{
+	"compilerOptions": {
+		"module": "commonjs",
+		"moduleResolution": "node",
+		"target": "es5",
+		"noImplicitAny": false,
+		"sourceMap": true,
+		"experimentalDecorators": true,
+		"resolveJsonModule": true,
+		"strict": true
+	},
+	"exclude": [
+		"node_modules"
+	]
+}

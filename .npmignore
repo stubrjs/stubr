@@ -1,0 +1,12 @@
+.DS_Store
+.idea
+.vs
+node_modules
+.code-workspace
+.babelrc
+.editorconfig
+coverage/
+logs/
+src/
+nodemon.json
+tsconfig*
