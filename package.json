@@ -14,9 +14,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "git@github.com:meetitude/stubr.git"
+    "url": "git@github.com:stubrjs/stubr.git"
   },
   "author": "Christian Dieckmann",
+  "keywords": ["stubs", "stub server", "mocks", "mock server", "mock server monitoring", "mock server ui"],
   "license": "ISC",
   "devDependencies": {
     "@babel/core": "^7.4.3",
