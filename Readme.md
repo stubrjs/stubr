@@ -1,6 +1,6 @@
 <img src="./docs/logo-large.png"/>
 
-[![CircleCI](https://circleci.com/gh/stubrjs/stubr/tree/master.svg?style=svg)](https://circleci.com/gh/stubrjs/stubr/tree/master)
+[![CircleCI](https://circleci.com/gh/stubrjs/stubr/tree/master.svg?style=svg)](https://circleci.com/gh/stubrjs/stubr/tree/master) [![Greenkeeper badge](https://badges.greenkeeper.io/stubrjs/stubr.svg)](https://greenkeeper.io/)
 
 A flexibile mock server to stub third party APIs. Stubr can answer API requests based on configured scenarios. These can be resolved automatically based on validation functions as well as manually via request interceptions. On top it optionally exposes a UI to monitor requests giving insights into request and response headers and bodies, determined scenarios and gives control over manual scenario resolution.
 
