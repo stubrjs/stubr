@@ -35,7 +35,7 @@ module.exports = {
     plugins: [
         new CopyPlugin([
             { 
-                from: path.resolve(__dirname, '../globals.d.ts'), 
+                from: path.resolve(__dirname, '../typings/globals.d.ts'), 
                 to: path.resolve(process.cwd(), './dist') 
             }
         ])

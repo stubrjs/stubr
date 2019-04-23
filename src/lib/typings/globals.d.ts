@@ -10,9 +10,11 @@ declare class Stubr {
         responseCode: number;
         responseHeaders?: { [key: string]: string };
         responseBody?: object;
-    })
+    }): void
 
-    run(): void
+    run(): Promise<void>
+
+    stop(): void
 }
 
 export default Stubr;
