@@ -1,6 +1,7 @@
-/// <reference path="main.d.ts" />
+/// <reference path="./typings/main.d.ts" />
 
 const debug = require('debug')('stubr');
+import * as http from 'http';
 import * as path from 'path';
 import logger from './utils/logger';
 import * as Koa from 'koa';
@@ -13,14 +14,16 @@ const socketIo = socketIo_;
 import { filter, remove, cloneDeep } from 'lodash';
 import uuid = require('uuid/v4');
 
-import { Method, EventType, ErrorCode } from './enums';
+import { Method, EventType, ErrorCode } from './typings/enums';
 import * as defaultConfig from './defaultconfig.json';
 import * as pjson from '../../package.json';
+import { threadId } from 'worker_threads';
 
 class Stubr {
 	private stubrConfig: Stubr.Config = {};
 	private mockServer: Koa = new Koa();
-	private uiServer: Koa = new Koa();
+	private mockServerHttp: http.Server | undefined;
+	private uiServer: http.Server = http.createServer();
 	private io: SocketIO.Server = socketIo();
 	private scenarios: Stubr.Scenario[] = [];
 	private routeConfigurations: Stubr.RouteConfiguration[] = [];
@@ -52,10 +55,22 @@ class Stubr {
 		this.mockServer.use(bodyParser());
 	}
 
-	private startMockServer () {
-		this.mockServer.listen(this.stubrConfig.stubsPort, () => {
-			logger.info(`started stubr on port: ${this.stubrConfig.stubsPort}`);
+	private startMockServer (): Promise<any> {
+		return new Promise((resolve, reject) => {
+			this.mockServerHttp = http.createServer(this.mockServer.callback());
+			this.mockServerHttp.listen(this.stubrConfig.stubsPort, () => {
+				logger.info(`started stubr on port: ${this.stubrConfig.stubsPort}`);
+				console.log(`started stubr on port: ${this.stubrConfig.stubsPort}`);
+				resolve();
+			}).on('error', (e) => {
+				logger.error('failed starting Stubr: ', e);
+				reject(e);
+			});
 		});
+	}
+
+	private stopMockServer (): void {
+		this.mockServerHttp ? this.mockServerHttp.close() : null;
 	}
 
 	private initUiServer () {
@@ -63,15 +78,25 @@ class Stubr {
 		const _staticFilesDirectory = path.resolve(__dirname, '../static');
 		debug(`serve static files from "${_staticFilesDirectory}"`);
 		app.use(koaServe(_staticFilesDirectory));
-		this.uiServer = require('http').createServer(app.callback());
+		this.uiServer = http.createServer(app.callback());
 		this.io = socketIo(this.uiServer);
 	}
 
-	private startUiServer () {
-		this.uiServer.listen(this.stubrConfig.uiPort, () => {
-			logger.info(`started stubr UI on port: ${this.stubrConfig.uiPort}`);
+	private stopUiServer (): void {
+		this.uiServer ? this.uiServer.close() : null;
+	}
 
-			this.bindSocketIoListeners();
+	private startUiServer (): Promise<any> {
+		return new Promise((resolve, reject) => {
+			this.uiServer.listen(this.stubrConfig.uiPort, () => {
+				logger.info(`started stubr UI on port: ${this.stubrConfig.uiPort}`);
+				console.log(`started stubr UI on port: ${this.stubrConfig.uiPort}`);
+				this.bindSocketIoListeners();
+				resolve();
+			}).on('error', (e) => {
+				logger.error('failed starting Stubr UI server: ', e);
+				reject(e);
+			});
 		});
 	}
 
@@ -237,7 +262,7 @@ class Stubr {
 		});
 	}
 
-	public run(): void {
+	public async run(): Promise<void> {
 		debug('run() stubr with config: ', this.stubrConfig);
 
 		// version
@@ -451,8 +476,21 @@ class Stubr {
 		});
 
 		this.extractRouteConfigurations();
-		this.startMockServer();
-		this.startUiServer();
+
+		return Promise.all([this.startMockServer(), this.startUiServer()])
+			.then(() => {
+				logger.info('Stubr is ready to be used.');
+				console.log('Stubr is ready to be used.');
+			})
+			.catch(() => {
+				logger.error('failed starting Stubr');
+				console.log('failed starting Stubr');
+			});
+	}
+
+	public stop(): void {
+		this.stopUiServer();
+		this.stopMockServer();
 	}
 }
 

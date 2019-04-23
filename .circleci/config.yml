@@ -1,4 +1,6 @@
 version: 2
+orbs:
+  codecov: codecov/codecov@1.0.4
 jobs:
   build:
     docker:
@@ -21,8 +23,13 @@ jobs:
           paths:
             - ./node_modules
       - run:
+          name: execute unit tests
+          command: npm test
+      - run:
           name: build ui
           command: npm run build:ui
       - run:
           name: build stubr
           command: npm run build:stubr
+      - codecov/upload:
+          file: ./coverage

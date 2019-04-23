@@ -1,5 +1,5 @@
 import { Method, ErrorCode } from "./enums";
-import { Stubr } from "./main";
+import Stubr from "../main";
 
 declare module Stubr {
     export interface Config {
