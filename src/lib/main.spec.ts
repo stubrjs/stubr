@@ -22,6 +22,19 @@ describe('Stubr REST API', () => {
         });
 
         stubr.register({
+            name: "get success case 2",
+            route: "/get/200",
+            method: Method.GET,
+            validate: (headers: object, body: object) => {
+                return true;
+            },
+            responseCode: 200,
+            responseBody: {
+                data: "foo 2"
+            }
+        });
+
+        stubr.register({
             group: "my group",
             name: "get success case with group",
             route: "/get/200/group",
