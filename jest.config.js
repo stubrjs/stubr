@@ -9,7 +9,11 @@ module.exports = {
     '!<rootDir>/src/**/__*__/*',
     '!<rootDir>/src/example.ts'
   ],
-  moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json'],
+  moduleFileExtensions: ['vue', 'ts', 'js', 'json'],
+  transform: {
+    '.*\\.(vue)$': 'vue-jest',
+    '^.+\\.tsx?$': 'ts-jest'
+  },
   globals: {
     'ts-jest': {
       diagnostics: {
