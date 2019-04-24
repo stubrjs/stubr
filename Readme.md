@@ -1,6 +1,8 @@
 <img src="./docs/logo-large.png"/>
 
-[![CircleCI](https://circleci.com/gh/stubrjs/stubr/tree/master.svg?style=svg)](https://circleci.com/gh/stubrjs/stubr/tree/master) [![Greenkeeper badge](https://badges.greenkeeper.io/stubrjs/stubr.svg)](https://greenkeeper.io/)
+[![CircleCI](https://circleci.com/gh/stubrjs/stubr/tree/master.svg?style=badge)](https://circleci.com/gh/stubrjs/stubr/tree/master) 
+[![Dependencies badge](https://david-dm.org/stubrjs/stubr.svg)](https://david-dm.org/stubrjs/stubr)
+[![Greenkeeper badge](https://badges.greenkeeper.io/stubrjs/stubr.svg)](https://greenkeeper.io/)
 
 A flexibile mock server to stub third party APIs. Stubr can answer API requests based on configured scenarios. These can be resolved automatically based on validation functions as well as manually via request interceptions. On top it optionally exposes a UI to monitor requests giving insights into request and response headers and bodies, determined scenarios and gives control over manual scenario resolution.
 
@@ -75,23 +77,40 @@ new Stubr({
 });
 ```
 
-On that you can register as many scenarios as you like passing a [scenario](#Scenario) object. Finally, the sever
+On that you can register as many scenarios as you like by passing a [scenario](#Scenario) object to the `stubr.register()` function. In order to register more than one scenario, call `stubr.register()` multiple times. Each time with a single scenario.
+
+```js
+stubr.register({
+	...
+});
+
+stubr.register({
+	...
+});
+```
+
+Finally, the server gets started via executing the `run()` function.
 
 ## Scenarios
 Below an example using all options you could pass to a scenario.
 ```js
 stubr.register({
-    group: "My Group", // scenarios can be grouped (optional)
-	name: "Scenario 1", // required
-	route: "/my/first/route", // required
-    method: Method.GET, // GET, POST, PUT, PATCH
-    delay: 2000, // delay response (optional)
-    // headers and body passed to provide context for validation
+	// scenarios can be grouped (optional)
+	group: "My Group",
+	// required
+	name: "Scenario 1",
+	// required
+	route: "/my/first/route", 
+	// GET, POST, PUT, PATCH
+	method: Method.GET,
+	// delay response (optional)
+	delay: 2000,
+	// headers and body passed to provide context for validation
 	validate: (requestHeaders, requestBody) => {
 		return true;
 	},
-    responseCode: 200,
-    // optionally you can receive headers and body to construct dynamic response based on request
+	responseCode: 200,
+	// optionally you can receive headers and body to construct dynamic response based on request
 	responseBody: (requestHeaders, requestBody) => {
 		data: "my first response"
 	}
@@ -106,6 +125,12 @@ The combination of `route` and `method` determines which scenarios are selected 
 `delay` can can be set to delay the response by x ms. Since requests to Stubr are usually answered within a few milliseconds, this attribute can optionally be used to match the expected performance of stubed APIs more realistically.
 
 The `responseBody` attribute can either be a static response object or optionally receive a function `responseBody: (requestHeaders, requestBody) => object` to dynamically construct the response object based on request.
+
+## Monitoring, UI
+
+Stubr comes with a UI, that enables monitoring incoming requests with request headers and body as well as the automatically determined scenario and respective response headers and body.
+
+Moreover, by scenarios covered routes are grouped and can be chosen to get intercepted via UI. Doing so would prevent respective routes from being answered automatically. Instead, the user gets presented with all registered scenarios for the intercepted route / method combination and can decide on which scenario should be used to answer the request manually.
 
 ## License
 MIT
