@@ -1,6 +1,6 @@
 <img src="./docs/logo-large.png"/>
 
-[![CircleCI](https://circleci.com/gh/stubrjs/stubr/tree/master.svg?style=badge)](https://circleci.com/gh/stubrjs/stubr/tree/master) 
+[![CircleCI](https://circleci.com/gh/stubrjs/stubr/tree/master.svg?style=shield)](https://circleci.com/gh/stubrjs/stubr/tree/master) 
 [![Dependencies badge](https://david-dm.org/stubrjs/stubr.svg)](https://david-dm.org/stubrjs/stubr)
 [![Greenkeeper badge](https://badges.greenkeeper.io/stubrjs/stubr.svg)](https://greenkeeper.io/)
 
