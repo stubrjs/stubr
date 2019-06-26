@@ -78,7 +78,7 @@
         display: flex;
         align-items: center;
         position: relative;
-        padding: 15px;
+        padding: 10px 15px;
         border-bottom: 1px solid $c-tile-separator;
         border-left: 3px solid transparent;
 
@@ -99,7 +99,7 @@
             font-size: 14px;
             padding-left: 10px;
             padding-right: 40px;
-            font-weight: 500;
+            font-weight: 400;
         }
 
         .tags {

@@ -52,4 +52,76 @@ stubr.register({
 	}
 });
 
+stubr.register({
+	group: "MyGroup",
+	name: "Test 6",
+	route: "/dummy/1",
+	method: Method.GET,
+	validate: (headers: object, body: object) => {
+		return true;
+	},
+	responseCode: 200,
+	responseBody: {}
+});
+
+stubr.register({
+	group: "MyGroup",
+	name: "Test 6",
+	route: "/dummy/2",
+	method: Method.GET,
+	validate: (headers: object, body: object) => {
+		return true;
+	},
+	responseCode: 200,
+	responseBody: {}
+});
+
+stubr.register({
+	group: "MyGroup",
+	name: "Test 6",
+	route: "/dummy/3",
+	method: Method.GET,
+	validate: (headers: object, body: object) => {
+		return true;
+	},
+	responseCode: 200,
+	responseBody: {}
+});
+
+stubr.register({
+	group: "MyGroup",
+	name: "Test 6",
+	route: "/dummy/4",
+	method: Method.GET,
+	validate: (headers: object, body: object) => {
+		return true;
+	},
+	responseCode: 200,
+	responseBody: {}
+});
+
+stubr.register({
+	group: "MyGroup",
+	name: "Test 6",
+	route: "/dummy/5",
+	method: Method.GET,
+	validate: (headers: object, body: object) => {
+		return true;
+	},
+	responseCode: 200,
+	responseBody: {}
+});
+
+stubr.register({
+	group: "MyGroup",
+	name: "Test 6",
+	route: "/dummy/6",
+	method: Method.GET,
+	validate: (headers: object, body: object) => {
+		return true;
+	},
+	responseCode: 200,
+	responseBody: {}
+});
+
 stubr.run();
