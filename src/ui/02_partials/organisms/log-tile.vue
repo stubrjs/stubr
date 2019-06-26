@@ -184,7 +184,7 @@
 
 			.route {
 				display: block;
-				font-size: 13px;
+				font-size: 14px;
 				font-weight: 400;
 				padding-right: 40px;
 			}

@@ -1,14 +1,17 @@
 <template>
     <div class="route-configurations-section">
         <div class="route-configurations">
-            <v-route-configuration
-                v-for="routeConfiguration in visibleRouteConfigurations"
-                :key="routeConfiguration.id"
-                class="route-configuration"
-                :route-configuration="routeConfiguration" />
+            <transition-group name="route-configs">
+                <v-route-configuration
+                    v-for="routeConfiguration in visibleRouteConfigurations"
+                    :key="routeConfiguration.id"
+                    class="route-configuration"
+                    :route-configuration="routeConfiguration" />
+            </transition-group>
         </div>
         <div class="list-expander">
             <button 
+                v-if="routeConfigurations && routeConfigurations.length > minimizedItemsMax"
                 class="toggle-trigger"
                 @click="isListExpanded = !isListExpanded">{{ expandListLabel }}</button>
         </div>
@@ -95,6 +98,21 @@
                 &:last-child {
                     border-bottom: 0;
                 }
+            }
+
+            .route-configs-item {
+                display: inline-block;
+                margin-right: 10px;
+                //height: 42px;
+            }
+
+            .route-configs-enter-active {
+                //height: 32px;
+                transition: all 0.35s;
+            }
+
+            .route-configs-enter, .route-configs-leave-to /* .list-leave-active below version 2.1.8 */ {
+                opacity: 0;
             }
         }
 
