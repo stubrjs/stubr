@@ -34,11 +34,12 @@
         display: inline-block;
         border-radius: 6px;
         padding: 4px 9px;
-        font-size: 13px;
+        font-size: 12px;
         background: #f5f5f5;
         font-weight: 500;
         pointer-events: none;
         transition: all 0.2s;
+        letter-spacing: 0.5px;
 
         &.clickable {
             pointer-events: auto;

@@ -85,20 +85,19 @@
         border: 1px solid $c-tile-separator;
         background: $c-reduced-presence-level-2;
         border-radius: 5px;
-        padding: 10px;
-
-        max-height: 300px;
-        overflow: scroll;
+        padding: 10px 10px 0 10px;
 
         &.revealed {
-               .expandable {
-                   display: block;
-               }
+            .expandable {
+                display: block;
+            }
         }
 
         .head {
+            z-index: 1;
             display: flex;
             align-items: center;
+            padding-bottom: 10px;
 
             .title {
                 color: $c-reduced-presence-level-1;
@@ -131,6 +130,9 @@
             display: none;
             padding-top: 30px;
             padding-left: 40px;
+            padding-bottom: 10px;
+            max-height: 300px;
+            overflow-y: scroll;
 
             .payload-section {
                 color: $c-reduced-presence-level-1;
@@ -146,9 +148,9 @@
             }
 
             .code {
-                font-family: "Anonymous Pro", monospace;
+                font-family: "Roboto Mono", monospace;
                 margin: 0;
-                font-size: 14px;
+                font-size: 13px;
                 line-height: 1.3;
                 letter-spacing: 1.3;
             }

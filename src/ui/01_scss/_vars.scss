@@ -1,14 +1,16 @@
 // colors
-$c-background: #f5f5f5;
-$c-reduced-presence-level-1: #AFAFAF;
-$c-reduced-presence-level-2: #F9F9F9;
-$c-tile-separator: #EEE;
 $c-blue: #2B81FE;
 $c-green: #29D286;
 $c-red: #DD1515;
 $c-purple: #DD15D7;
 $c-yellow: #ffd800;
 $c-orange: #FF9200;
+
+$c-background: #f5f5f5;
+$c-reduced-presence-level-1: #AFAFAF;
+$c-reduced-presence-level-2: #F9F9F9;
+$c-tile-separator: #EEE;
+$c-highlight: $c-blue;
 $c-error: $c-red;
 $c-success: $c-green;
 $c-interception: $c-orange;;

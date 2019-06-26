@@ -1,7 +1,7 @@
 <template>
 	<div class="log-tile">
 		<div class="head">
-			<div class="head-left" style="display: flex;">
+			<div class="head-left" style="display: flex; align-items: center;">
 				<div :class="['route-type', routeClass]">{{ logEntry.method }}</div>
 				<div class="route">{{ logEntry.route }}</div>
 				<v-tag 
@@ -159,13 +159,6 @@
 			padding: 10px;
 			border-bottom: 1px solid $c-tile-separator;
 
-			.left {
-				display: flex;
-				align-items: center;
-				flex-grow: 1;
-				background: #F00;
-			}
-
 			.route-type {
 				display: block;
 				font-size: 13px;
@@ -191,8 +184,8 @@
 
 			.route {
 				display: block;
-				font-size: 13px;
-				font-weight: 600;
+				font-size: 14px;
+				font-weight: 400;
 				padding-right: 40px;
 			}
 

@@ -67,6 +67,7 @@
                 }
 
                 .name {
+                    font-family: "QuickSand";
                     padding-left: 10px;
                     font-size: 25px;
                     font-weight: 500;
