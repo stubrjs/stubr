@@ -35,4 +35,22 @@ stubr.register({
 	}
 });
 
+stubr.register({
+	group: "MyGroup",
+	name: "Test with Params",
+	route: "/route-with-params",
+	method: Method.GET,
+	validate: (headers: object, body: object, params: object) => {
+		return params && (params as any).test === "1234";
+	},
+	responseCode: 200,
+	responseBody: (headers: object, body: object, params: object) => {
+		return {
+			...body,
+			data: "yay, dynamic body",
+			params: params
+		}
+	}
+});
+
 stubr.run();

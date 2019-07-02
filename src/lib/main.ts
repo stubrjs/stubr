@@ -275,7 +275,7 @@ class Stubr {
 				// to enable dynamic determination of response body
 				if (typeof  scenario.responseBody == "function") {
 					debug("execute function responseBody() since responseBody was determined to by a function");
-					ctx.body = scenario.responseBody(ctx.request.headers, ctx.request.body);
+					ctx.body = scenario.responseBody(ctx.request.headers, ctx.request.body, ctx.request.query);
 				} else {
 					debug("assign responseBody without evaluation");
 					ctx.body = scenario.responseBody;
@@ -291,7 +291,8 @@ class Stubr {
 					intercepted: false,
 					request: {
 						headers: ctx.request.headers,
-						body: ctx.request.body
+						body: ctx.request.body,
+						params: ctx.request.query
 					},
 					response: {
 						status: ctx.status,
@@ -309,17 +310,18 @@ class Stubr {
 				logger.info(JSON.stringify(_logEntry));
 			}
 
-			const _filteredScenarios: Stubr.Scenario[] = this.getScenarioMatchesForRouteAndMethod(ctx.url, <Method>ctx.method);
+			const _filteredScenarios: Stubr.Scenario[] = this.getScenarioMatchesForRouteAndMethod(ctx.path, <Method>ctx.method);
 	
 			if (this.isInterceptedForRouteAndMethod(ctx.url, <Method>ctx.method)) {
 				const _logEntry: Stubr.LogEntry = {
 					id: uuid(),
-					route: ctx.url,
+					route: ctx.path,
 					method: <Method>ctx.method,
 					intercepted: true,
 					request: {
 						headers: ctx.request.headers,
-						body: ctx.request.body
+						body: ctx.request.body,
+						params: ctx.request.query
 					},
 					scenarios: _filteredScenarios.map((scenario: Stubr.Scenario): { id: string | undefined, group: string | undefined, name: string } => {
 						return {
@@ -355,7 +357,7 @@ class Stubr {
 				 const _scenarioMatch: Stubr.Scenario | undefined = _filteredScenarios.find((scenario: Stubr.Scenario): boolean => {
 					if (typeof scenario.validate == "function") {
 						debug(`execute function validate() for scenario with name "${scenario.name}"`);
-						const _isValid = scenario.validate(ctx.request.headers, ctx.request.body);
+						const _isValid = scenario.validate(ctx.request.headers, ctx.request.body, ctx.request.query);
 	
 						if (_isValid) {
 							debug(`found match for scenario with name "${scenario.name}"`);
@@ -393,11 +395,12 @@ class Stubr {
 	
 					const _logEntry: Stubr.LogEntry = {
 						id: uuid(),
-						route: ctx.url,
+						route: ctx.path,
 						method: <Method>ctx.method,
 						intercepted: false,
 						request: {
 							headers: ctx.request.headers,
+							params: ctx.request.query,
 							body: ctx.request.body
 						},
 						response: {
@@ -425,12 +428,13 @@ class Stubr {
 	
 					const _logEntry: Stubr.LogEntry = {
 						id: uuid(),
-						route: ctx.url,
+						route: ctx.path,
 						method: <Method>ctx.method,
 						intercepted: false,
 						request: {
 							headers: ctx.request.headers,
-							body: ctx.request.body
+							body: ctx.request.body,
+							params: ctx.request.query
 						},
 						response: {
 							status: ctx.status,

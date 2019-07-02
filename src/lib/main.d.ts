@@ -14,7 +14,7 @@ declare module Stubr {
         method: Method;
         group?: string;
         delay?: number;
-        validate: (headers: object, body: object) => boolean;
+        validate: (headers: object, body: object, params: object) => boolean;
         responseCode: number;
         responseHeaders?: { [key: string]: string };
         responseBody?: object;
@@ -31,6 +31,7 @@ declare module Stubr {
         request: {
             headers: { [key: string]: string };
             body: object;
+            params: object;
         }
         response?: {
             status: number;

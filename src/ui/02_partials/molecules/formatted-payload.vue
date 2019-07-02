@@ -13,6 +13,9 @@
             <div class="payload-section">Headers</div>
             <button v-if="false" class="copy-btn" :data-clipboard-text="JSON.stringify(headers)">Copy</button>
             <pre class="code">{{ headers }}</pre>
+
+            <div v-if="hasParams" class="payload-section">Params</div>
+            <pre v-if="hasParams" class="code">{{ params }}</pre>
         
             <div class="payload-section">Body</div>
             <pre class="code">{{ body }}</pre>
@@ -24,6 +27,7 @@
     import Vue from 'vue';
     import Icon from '../atoms/icon.vue';
     import Clipboard from 'clipboard';
+    import { isEmpty } from 'lodash';
 
     export default Vue.extend({
         props: {
@@ -31,6 +35,9 @@
                 type: String
             },
             headers: {
+                type: Object
+            },
+            params: {
                 type: Object
             },
             body: {
@@ -62,7 +69,10 @@
                 } else {
                     return null;
                 }
-            }
+            },
+            hasParams (): boolean {
+				return this.params && !isEmpty(this.params);
+			}
         },
         methods: {
             handleRevealClick (e: Event): void {
