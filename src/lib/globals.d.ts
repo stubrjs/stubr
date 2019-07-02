@@ -6,7 +6,7 @@ declare class Stubr {
         method: Method;
         group?: string;
         delay?: number;
-        validate: (headers: object, body: object) => boolean;
+        validate: (headers: object, body: object, params: object) => boolean;
         responseCode: number;
         responseHeaders?: { [key: string]: string };
         responseBody?: object;

@@ -45,6 +45,7 @@
 				title="Request"
 				:icon-color="color"
 				:headers="logEntry.request.headers"
+				:params="logEntry.request.params"
 				:body="logEntry.request.body"></v-formatted-payload>
 
 			<v-scenario-selector 
@@ -108,7 +109,7 @@
 					default:
 						break;
 				}
-            },
+			},
 			noRouteMatch (): boolean {
 				return this.logEntry.error && this.logEntry.error.code == "NO_ROUTE_MATCH" || false;
 			},

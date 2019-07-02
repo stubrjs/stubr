@@ -22,6 +22,7 @@ interface LogEntryRemote {
 	request: {
 		headers: { [key: string]: string };
 		body: object;
+		params: object;
 	}
 	response?: {
 		status: number;
