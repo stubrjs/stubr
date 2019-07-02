@@ -44,10 +44,11 @@ stubr.register({
 		return params && (params as any).test === "1234";
 	},
 	responseCode: 200,
-	responseBody: (headers: object, body: object) => {
+	responseBody: (headers: object, body: object, params: object) => {
 		return {
 			...body,
-			data: "yay, dynamic body"
+			data: "yay, dynamic body",
+			params: params
 		}
 	}
 });

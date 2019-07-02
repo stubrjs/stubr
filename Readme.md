@@ -28,7 +28,7 @@ stubr.register({
 	name: "Scenario 1",
 	route: "/my/first/route",
 	method: Method.GET,
-	validate: (requestHeaders: object, requestBody: object) => {
+	validate: (requestHeaders: object, requestBody: object, requestParams: object) => {
 		return true;
 	},
 	responseCode: 200,
@@ -54,7 +54,7 @@ stubr.register({
 	name: "Scenario 1",
 	route: "/my/first/route",
 	method: Method.GET,
-	validate: (requestHeaders, requestBody) => {
+	validate: (requestHeaders, requestBody, requestParams) => {
 		return true;
 	},
 	responseCode: 200,
@@ -106,17 +106,17 @@ stubr.register({
 	// delay response (optional)
 	delay: 2000,
 	// headers and body passed to provide context for validation
-	validate: (requestHeaders, requestBody) => {
+	validate: (requestHeaders, requestBody, requestParams) => {
 		return true;
 	},
 	responseCode: 200,
 	// optionally you can receive headers and body to construct dynamic response based on request
-	responseBody: (requestHeaders, requestBody) => {
+	responseBody: (requestHeaders, requestBody, requestParams) => {
 		data: "my first response"
 	}
 });
 ```
-The `validate: (requestHeaders, requestBody) => boolean` function shall be used to determine the matching scenario. Headers and body of request can be used to determine whether the scenario is matched or not. If the function returns `true` the scenario is considered to be matched and thus used to resolve the response. 
+The `validate: (requestHeaders, requestBody, requestParams) => boolean` function shall be used to determine the matching scenario. Headers, query params and body of request can be used to determine whether the scenario is matched or not. If the function returns `true` the scenario is considered to be matched and thus used to resolve the response. 
 
 The combination of `route` and `method` determines which scenarios are selected for evaluation. Since requests can only be answered with one response at a time, the first scenario match wins to be selected for response (even though multiple scenarios are evaluated to be tue).
 
@@ -124,11 +124,11 @@ The combination of `route` and `method` determines which scenarios are selected 
 
 `delay` can can be set to delay the response by x ms. Since requests to Stubr are usually answered within a few milliseconds, this attribute can optionally be used to match the expected performance of stubed APIs more realistically.
 
-The `responseBody` attribute can either be a static response object or optionally receive a function `responseBody: (requestHeaders, requestBody) => object` to dynamically construct the response object based on request.
+The `responseBody` attribute can either be a static response object or optionally receive a function `responseBody: (requestHeaders, requestBody, requestParams) => object` to dynamically construct the response object based on request.
 
 ## Monitoring, UI
 
-Stubr comes with a UI, that enables monitoring incoming requests with request headers and body as well as the automatically determined scenario and respective response headers and body.
+Stubr comes with a UI, that enables monitoring incoming requests with request headers and body as well as the automatically determined scenario and respective response headers, query params and body.
 
 Moreover, by scenarios covered routes are grouped and can be chosen to get intercepted via UI. Doing so would prevent respective routes from being answered automatically. Instead, the user gets presented with all registered scenarios for the intercepted route / method combination and can decide on which scenario should be used to answer the request manually.
 

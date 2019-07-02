@@ -275,7 +275,7 @@ class Stubr {
 				// to enable dynamic determination of response body
 				if (typeof  scenario.responseBody == "function") {
 					debug("execute function responseBody() since responseBody was determined to by a function");
-					ctx.body = scenario.responseBody(ctx.request.headers, ctx.request.body);
+					ctx.body = scenario.responseBody(ctx.request.headers, ctx.request.body, ctx.request.query);
 				} else {
 					debug("assign responseBody without evaluation");
 					ctx.body = scenario.responseBody;
