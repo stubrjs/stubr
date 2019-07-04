@@ -110,7 +110,11 @@ stubr.register({
 		return true;
 	},
 	responseCode: 200,
-	// optionally you can receive headers and body to construct dynamic response based on request
+	// optionally you can receive headers and body to construct dynamic response headers based on request
+	responseHeaders: (requestHeaders, requestBody, requestParams) => {
+		"X-My-Header-Attribute": "abc"
+	},
+	// optionally you can receive headers and body to construct dynamic response body based on request
 	responseBody: (requestHeaders, requestBody, requestParams) => {
 		data: "my first response"
 	}
@@ -124,7 +128,9 @@ The combination of `route` and `method` determines which scenarios are selected 
 
 `delay` can can be set to delay the response by x ms. Since requests to Stubr are usually answered within a few milliseconds, this attribute can optionally be used to match the expected performance of stubed APIs more realistically.
 
-The `responseBody` attribute can either be a static response object or optionally receive a function `responseBody: (requestHeaders, requestBody, requestParams) => object` to dynamically construct the response object based on request.
+The `responseHeaders` attribute can either be a static response object or optionally receive a function `responseHeaders: (requestHeaders, requestBody, requestParams) => object` to dynamically construct the response headers object based on request.
+
+The `responseBody` attribute can either be a static response object or optionally receive a function `responseBody: (requestHeaders, requestBody, requestParams) => object` to dynamically construct the response body based on request.
 
 ## Monitoring, UI
 

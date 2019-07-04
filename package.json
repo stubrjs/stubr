@@ -1,6 +1,6 @@
 {
   "name": "stubr",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "A flexibile mock server allowing validation based automatic resolving as well as manual resolving through interceptions.",
   "main": "dist/stubr.common.js",
   "types": "dist/globals.d.ts",
@@ -25,7 +25,7 @@
     "mock server monitoring",
     "mock server ui"
   ],
-  "license": "ISC",
+  "license": "MIT",
   "devDependencies": {
     "@babel/core": "^7.4.5",
     "@babel/preset-env": "^7.4.5",

@@ -49,6 +49,7 @@ class Stubr {
 	}
 
 	private initMockServer () {
+		debug(`current working dir: "${path.resolve(__dirname)}"`);
 		this.mockServer.use(bodyParser());
 	}
 
@@ -267,14 +268,29 @@ class Stubr {
 				if (scenario.name) {
 					ctx.set('X-Stubr-Case-Name', scenario.name);
 				}
-				if (typeof scenario.responseHeaders == "object") {
+
+				// if responseBody is a function pass request headers and body
+				// to enable dynamic determination of response body
+				if (typeof scenario.responseHeaders == "function") {
+					debug("execute function responseHeaders() since responseHeaders was determined to be a function");
+					const _headers = scenario.responseHeaders(ctx.request.headers, ctx.request.body, ctx.request.query);
+					if (typeof _headers == "object") {
+						debug("assign responseHeaders after evaluation");
+						ctx.set(_headers);
+					} else {
+						logger.warn(`"responseHeaders" function is supposed to return an object, but has been identified to have return of type ${typeof _headers} for scenario name "${scenario.name}"`);
+					}
+				} else if (typeof scenario.responseHeaders == "object") {
+					debug("assign responseHeaders without evaluation");
 					ctx.set(scenario.responseHeaders);
+				} else {
+					logger.warn(`"responseHeaders" are supposed to be an object or function, but have been identified to be of type ${typeof scenario.responseHeaders} for scenario name "${scenario.name}"`);
 				}
 
 				// if responseBody is a function pass request headers and body
 				// to enable dynamic determination of response body
 				if (typeof  scenario.responseBody == "function") {
-					debug("execute function responseBody() since responseBody was determined to by a function");
+					debug("execute function responseBody() since responseBody was determined to be a function");
 					ctx.body = scenario.responseBody(ctx.request.headers, ctx.request.body, ctx.request.query);
 				} else {
 					debug("assign responseBody without evaluation");
