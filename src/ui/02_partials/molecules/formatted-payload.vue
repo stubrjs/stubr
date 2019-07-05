@@ -18,7 +18,12 @@
             <pre v-if="hasParams" class="code">{{ params }}</pre>
         
             <div class="payload-section">Body</div>
-            <pre class="code">{{ body }}</pre>
+            <pre 
+                v-if="!hasSentFile" 
+                class="code">{{ body }}</pre>
+            <pre 
+                v-if="hasSentFile" 
+                class="code">[FILE PAYLOAD]</pre>
         </div>
     </div>
 </template>
@@ -39,6 +44,9 @@
             },
             params: {
                 type: Object
+            },
+            hasSentFile: {
+                type: Boolean
             },
             body: {
                 type: Object

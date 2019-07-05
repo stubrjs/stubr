@@ -60,6 +60,7 @@
 				title="Response"
 				:icon-color="color"
 				:headers="logEntry.response.headers"
+				:has-sent-file="logEntry.response.hasSentFile"
 				:body="logEntry.response.body"
 				:status-code="logEntry.response.status"></v-formatted-payload>
 		</div>

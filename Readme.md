@@ -114,6 +114,8 @@ stubr.register({
 	responseHeaders: (requestHeaders, requestBody, requestParams) => {
 		"X-My-Header-Attribute": "abc"
 	},
+	// optionally you can reference a file to be sent as response
+	responseFilePath: "./example.pdf",
 	// optionally you can receive headers and body to construct dynamic response body based on request
 	responseBody: (requestHeaders, requestBody, requestParams) => {
 		data: "my first response"
@@ -130,6 +132,8 @@ The combination of `route` and `method` determines which scenarios are selected 
 
 The `responseHeaders` attribute can either be a static response object or optionally receive a function `responseHeaders: (requestHeaders, requestBody, requestParams) => object` to dynamically construct the response headers object based on request.
 
+The `responseFilePath` attribute defines the path to a static file to be exposed as response. The path needs to be a string and is interpreted relative to the script file, which defines the `register()` function. The file type of referenced file is being used to auto populate the `Content-Type` response header. If `responseFilePath` is specified, then a potentially additionally defined `responseBody` would be ignored.
+
 The `responseBody` attribute can either be a static response object or optionally receive a function `responseBody: (requestHeaders, requestBody, requestParams) => object` to dynamically construct the response body based on request.
 
 ## Monitoring, UI
@@ -139,4 +143,4 @@ Stubr comes with a UI, that enables monitoring incoming requests with request he
 Moreover, by scenarios covered routes are grouped and can be chosen to get intercepted via UI. Doing so would prevent respective routes from being answered automatically. Instead, the user gets presented with all registered scenarios for the intercepted route / method combination and can decide on which scenario should be used to answer the request manually.
 
 ## License
-MIT
+Stubr is licensed under the MIT license.

@@ -1,6 +1,7 @@
 /// <reference path="main.d.ts" />
 
 const debug = require('debug')('stubr');
+import * as fs from 'fs';
 import * as path from 'path';
 import logger from './utils/logger';
 import * as Koa from 'koa';
@@ -12,6 +13,7 @@ import * as socketIo_ from 'socket.io';
 const socketIo = socketIo_;
 import { filter, remove, cloneDeep } from 'lodash';
 import uuid = require('uuid/v4');
+import * as stackTrace from 'stack-trace';
 
 import { Method, EventType, ErrorCode } from './enums';
 import * as defaultConfig from './defaultconfig.json';
@@ -49,7 +51,7 @@ class Stubr {
 	}
 
 	private initMockServer () {
-		debug(`current working dir: "${path.resolve(__dirname)}"`);
+		debug(`current working dir: "${path.resolve(process.cwd())}"`);
 		this.mockServer.use(bodyParser());
 	}
 
@@ -232,9 +234,20 @@ class Stubr {
 	}
 
 	public register(scenario: Stubr.Scenario): void {
+
+		// extract caller file path
+		const _stackTrace = stackTrace.parse(new Error());
+		let _callerFilePath: string = "";
+		if (_stackTrace.length >= 2) {
+			_callerFilePath = path.dirname(_stackTrace[1].fileName);
+		}
+
+		debug(`register() caller file path "${_callerFilePath}"`);
+
 		this.scenarios.push({
 			...scenario, 
-			id: scenario.id ? scenario.id : uuid() 
+			id: scenario.id ? scenario.id : uuid(),
+			responseFilePath: scenario.responseFilePath ? path.join(_callerFilePath, scenario.responseFilePath) : scenario.responseFilePath
 		});
 	}
 
@@ -261,13 +274,15 @@ class Stubr {
 		this.mockServer.use(async (ctx, next) => {
 			const _io: SocketIO.Server = this.io;
 
-			function seedResponseWithCase(ctx: any, scenario: Stubr.Scenario, logEntryId?: string): void {
+			async function seedResponseWithCase(ctx: any, scenario: Stubr.Scenario, logEntryId?: string): Promise<any> {
 				if (scenario.group) {
 					ctx.set('X-Stubr-Case-Group', scenario.group);
 				}
 				if (scenario.name) {
 					ctx.set('X-Stubr-Case-Name', scenario.name);
 				}
+
+				ctx.status = scenario.responseCode;
 
 				// if responseBody is a function pass request headers and body
 				// to enable dynamic determination of response body
@@ -283,20 +298,50 @@ class Stubr {
 				} else if (typeof scenario.responseHeaders == "object") {
 					debug("assign responseHeaders without evaluation");
 					ctx.set(scenario.responseHeaders);
-				} else {
+				} else if (scenario.responseHeaders) {
 					logger.warn(`"responseHeaders" are supposed to be an object or function, but have been identified to be of type ${typeof scenario.responseHeaders} for scenario name "${scenario.name}"`);
 				}
 
-				// if responseBody is a function pass request headers and body
-				// to enable dynamic determination of response body
-				if (typeof  scenario.responseBody == "function") {
+				if (scenario.responseFilePath && typeof scenario.responseFilePath == "string") {
+					// send file if responseFilePath has been
+					const _filePath: string = path.resolve(process.cwd(), scenario.responseFilePath);
+					debug(`send file from path: "${_filePath}"`);
+
+					let _stats: any = null;
+					let _existsFile: boolean = false;
+
+					try {
+						_stats = fs.statSync(_filePath);
+						_existsFile = true;
+					} catch (err) {
+						_existsFile = false;
+						const _notfound = ['ENOENT', 'ENAMETOOLONG', 'ENOTDIR']
+						if (_notfound.includes(err.code)) {
+							logger.warn(`could not send file, since it was not found at path "${_filePath}" for scenario name "${scenario.name}"`);
+
+							ctx.status = 404;
+						}
+					}
+
+					if (_existsFile && _stats) {
+						ctx.set('Content-Length', _stats.size);
+						ctx.attachment(path.basename(_filePath));
+						if (_stats.mtime) ctx.set('Last-Modified',  _stats.mtime.toUTCString());
+						if (!ctx.type) ctx.type = path.extname(_filePath);
+
+						ctx.body = fs.createReadStream(_filePath);
+					} else {
+						ctx.body = { error: "file not found" }
+					}
+				} else if (typeof  scenario.responseBody == "function") {
+					// if responseBody is a function pass request headers and body
+					// to enable dynamic determination of response body
 					debug("execute function responseBody() since responseBody was determined to be a function");
 					ctx.body = scenario.responseBody(ctx.request.headers, ctx.request.body, ctx.request.query);
-				} else {
+				} else if (scenario.responseBody) {
 					debug("assign responseBody without evaluation");
 					ctx.body = scenario.responseBody;
 				}
-				ctx.status = scenario.responseCode;
 
 				const _logEntry: Stubr.LogEntry = {
 					id: logEntryId || uuid(),
@@ -313,6 +358,7 @@ class Stubr {
 					response: {
 						status: ctx.status,
 						headers: ctx.response.headers,
+						hasSentFile: scenario.responseFilePath !== undefined && scenario.responseFilePath !== null && ctx.status < 400,
 						body: ctx.body
 					}
 				};
@@ -422,6 +468,7 @@ class Stubr {
 						response: {
 							status: ctx.status,
 							headers: ctx.response.headers,
+							hasSentFile: false,
 							body: ctx.body
 						},
 						error: {
@@ -455,6 +502,7 @@ class Stubr {
 						response: {
 							status: ctx.status,
 							headers: ctx.response.headers,
+							hasSentFile: false,
 							body: ctx.body
 						},
 						error: {
