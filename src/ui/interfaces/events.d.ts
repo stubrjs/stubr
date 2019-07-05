@@ -27,6 +27,7 @@ interface LogEntryRemote {
 	response?: {
 		status: number;
 		headers: { [key: string]: string };
+		hasSentFile: boolean;
 		body: object;
 	}
 	scenarios?: Array<{

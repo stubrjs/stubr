@@ -16,8 +16,9 @@ declare module Stubr {
         delay?: number;
         validate: (headers: object, body: object, params: object) => boolean;
         responseCode: number;
-        responseHeaders?: { [key: string]: string };
-        responseBody?: object;
+        responseHeaders?: { [key: string]: string } | ((headers: object, body: object, params: object) => object);
+        responseFilePath?: string,
+        responseBody?: object | ((headers: object, body: object, params: object) => any);
     }
     
     interface LogEntry {
@@ -36,6 +37,7 @@ declare module Stubr {
         response?: {
             status: number;
             headers: { [key: string]: string };
+            hasSentFile: boolean;
             body: object;
         }
         scenarios?: Array<{
