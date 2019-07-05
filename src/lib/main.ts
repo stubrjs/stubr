@@ -374,7 +374,7 @@ class Stubr {
 
 			const _filteredScenarios: Stubr.Scenario[] = this.getScenarioMatchesForRouteAndMethod(ctx.path, <Method>ctx.method);
 	
-			if (this.isInterceptedForRouteAndMethod(ctx.url, <Method>ctx.method)) {
+			if (this.isInterceptedForRouteAndMethod(ctx.path, <Method>ctx.method)) {
 				const _logEntry: Stubr.LogEntry = {
 					id: uuid(),
 					route: ctx.path,
