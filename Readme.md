@@ -72,8 +72,8 @@ The usage of Stubr starts with creation of a new instance. Optionally, you can p
 
 ```js
 new Stubr({
-    "stubsPort": 4000,  // default value: 4000
-    "uiPort": 3000      // default value: 3000
+    "stubsPort": 4000,  	// default value: 4000
+	"uiPort": 3000,      	// default value: 3000
 });
 ```
 
@@ -100,8 +100,8 @@ stubr.register({
 	// required
 	name: "Scenario 1",
 	// required
-	route: "/my/first/route", 
-	// GET, POST, PUT, PATCH
+	route: "/my/first/{dynamic}/route", 
+	// GET, POST, PUT, DELETE
 	method: Method.GET,
 	// delay response (optional)
 	delay: 2000,
@@ -124,7 +124,7 @@ stubr.register({
 ```
 The `validate: (requestHeaders, requestBody, requestParams) => boolean` function shall be used to determine the matching scenario. Headers, query params and body of request can be used to determine whether the scenario is matched or not. If the function returns `true` the scenario is considered to be matched and thus used to resolve the response. 
 
-The combination of `route` and `method` determines which scenarios are selected for evaluation. Since requests can only be answered with one response at a time, the first scenario match wins to be selected for response (even though multiple scenarios are evaluated to be tue).
+The combination of `route` and `method` determines which scenarios are selected for evaluation. Since requests can only be answered with one response at a time, the first scenario match wins to be selected for response (even though multiple scenarios are evaluated to be tue). Routes can also have wildcards. Path segments being wrapped with curly brackets are treated as wildcards and their keys and values get injected to `params` attribute, which can be used in validation functions, dynamic response headers and dynamic response body.
 
 `group` can help structuring scenarios, but is optional.
 

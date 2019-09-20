@@ -35,11 +35,28 @@ stubr.register({
 	}
 });
 
-// example for dynamic headers and params
+stubr.register({
+	group: "MyGroup",
+	name: "Test Put",
+	route: "/test-get",
+	method: Method.PUT,
+	validate: (headers: object, body: object) => {
+		return true;
+	},
+	responseCode: 200,
+	responseBody: (headers: object, body: object) => {
+		return {
+			...body,
+			data: "yay, dynamic body"
+		}
+	}
+});
+
+// example for dynamic headers, route params and query params
 stubr.register({
 	group: "MyGroup",
 	name: "Test with Params",
-	route: "/route-with-params",
+	route: "/{dynamic}/route-with-params",
 	method: Method.GET,
 	validate: (headers: object, body: object, params: object) => {
 		return params && (params as any).test;

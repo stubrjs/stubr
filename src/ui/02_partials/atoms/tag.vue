@@ -121,5 +121,24 @@
                 }
             }
         }
+
+        &.purple {
+            color: $c-purple;
+            background: lighten($c-purple, 45%);
+
+            &:hover {
+                background: lighten($c-purple, 40%);
+            }
+
+            &.active {
+                color: #fff;
+                background: $c-purple;
+                box-shadow: 0 1px 7px 0 #FF920066;
+
+                &:hover {
+                    background: lighten($c-purple, 5%);
+                }
+            }
+        }
     }
 </style>
