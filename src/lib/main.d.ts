@@ -5,6 +5,7 @@ declare module Stubr {
     export interface Config {
         stubsPort?: number;
         uiPort?: number;
+        relativePath?: string;
     }
     
     interface Scenario {

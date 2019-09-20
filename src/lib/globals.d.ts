@@ -1,4 +1,6 @@
 declare class Stubr {
+    constructor(config?: object);
+
     register(scenario: {
         id?: string;
         name: string;

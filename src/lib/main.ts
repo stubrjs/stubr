@@ -43,7 +43,7 @@ class Stubr {
 	private loadConfiguration (stubrConfig?: Stubr.Config) {
 		if (stubrConfig) {
 			debug('use custom config');
-			this.stubrConfig = stubrConfig;
+			this.stubrConfig = {...defaultConfig, ...stubrConfig};
 		} else {
 			debug('use default config');
 			this.stubrConfig = <Stubr.Config>defaultConfig;
@@ -179,7 +179,48 @@ class Stubr {
 
 	// filter scenarios by matching route and method
 	private getScenarioMatchesForRouteAndMethod (route: string, method: Method): Stubr.Scenario[] {
-		return filter(this.scenarios, (scenario) => scenario.route === route && scenario.method === method);
+		return filter(this.scenarios, (scenario) => {
+			if (scenario.method !== method) {
+				return false;
+			}
+
+			const _segmentedScenarioRoute: Array<String> = scenario.route.split('/');
+			const _segmentedRequestRoute: Array<String> = route.split('/');
+
+			let _isMatch = true;
+			_segmentedRequestRoute.forEach((segment, index) => {
+				if ((segment && !_segmentedScenarioRoute[index]) || 
+					(_segmentedScenarioRoute[index] !== segment && !(_segmentedScenarioRoute[index].startsWith('{') && _segmentedScenarioRoute[index].endsWith('}')))) {
+					debug(`scenario segment "${_segmentedScenarioRoute[index]}" does not match "${segment}"`);
+					_isMatch = false;
+				}
+			});
+
+			return _isMatch;
+		});
+	}
+
+	private extractPathParams (route: string, scenario: Stubr.Scenario): object {
+		if (!route || !scenario) {
+			return {};
+		}
+
+		const _pathParams = {};
+		const _segmentedScenarioRoute: Array<String> = scenario.route.split('/');
+		const _segmentedRequestRoute: Array<String> = route.split('/');
+
+		function isWildcard (segment) {
+			if (!segment || typeof segment !== "string") return false;
+			return segment.startsWith('{') && segment.endsWith('}');
+		}
+
+		_segmentedRequestRoute.forEach((segment, index) => {
+			if (isWildcard(_segmentedScenarioRoute[index])) {
+				_pathParams[_segmentedScenarioRoute[index].substring(1, _segmentedScenarioRoute[index].length - 1)] = segment;
+			}
+		});
+
+		return _pathParams;
 	}
 
 	private isInterceptedForRouteAndMethod (route: string, method: Method): boolean {
@@ -274,6 +315,10 @@ class Stubr {
 		this.mockServer.use(async (ctx, next) => {
 			const _io: SocketIO.Server = this.io;
 
+			let _params = {
+				...ctx.request.query
+			}
+
 			async function seedResponseWithCase(ctx: any, scenario: Stubr.Scenario, logEntryId?: string): Promise<any> {
 				if (scenario.group) {
 					ctx.set('X-Stubr-Case-Group', scenario.group);
@@ -353,7 +398,7 @@ class Stubr {
 					request: {
 						headers: ctx.request.headers,
 						body: ctx.request.body,
-						params: ctx.request.query
+						params: _params
 					},
 					response: {
 						status: ctx.status,
@@ -373,7 +418,15 @@ class Stubr {
 			}
 
 			const _filteredScenarios: Stubr.Scenario[] = this.getScenarioMatchesForRouteAndMethod(ctx.path, <Method>ctx.method);
-	
+			
+			// merge path params with query params
+			if (_filteredScenarios && _filteredScenarios.length > 0) {
+				_params = {
+					...this.extractPathParams(ctx.path, _filteredScenarios[0]),
+					..._params
+				}
+			}
+
 			if (this.isInterceptedForRouteAndMethod(ctx.path, <Method>ctx.method)) {
 				const _logEntry: Stubr.LogEntry = {
 					id: uuid(),
@@ -383,7 +436,7 @@ class Stubr {
 					request: {
 						headers: ctx.request.headers,
 						body: ctx.request.body,
-						params: ctx.request.query
+						params: _params
 					},
 					scenarios: _filteredScenarios.map((scenario: Stubr.Scenario): { id: string | undefined, group: string | undefined, name: string } => {
 						return {
@@ -462,7 +515,7 @@ class Stubr {
 						intercepted: false,
 						request: {
 							headers: ctx.request.headers,
-							params: ctx.request.query,
+							params: _params,
 							body: ctx.request.body
 						},
 						response: {
@@ -497,7 +550,7 @@ class Stubr {
 						request: {
 							headers: ctx.request.headers,
 							body: ctx.request.body,
-							params: ctx.request.query
+							params: _params
 						},
 						response: {
 							status: ctx.status,
