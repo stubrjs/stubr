@@ -333,7 +333,7 @@ class Stubr {
 				// to enable dynamic determination of response body
 				if (typeof scenario.responseHeaders == "function") {
 					debug("execute function responseHeaders() since responseHeaders was determined to be a function");
-					const _headers = scenario.responseHeaders(ctx.request.headers, ctx.request.body, ctx.request.query);
+					const _headers = scenario.responseHeaders(ctx.request.headers, ctx.request.body, _params);
 					if (typeof _headers == "object") {
 						debug("assign responseHeaders after evaluation");
 						ctx.set(_headers);
@@ -382,7 +382,7 @@ class Stubr {
 					// if responseBody is a function pass request headers and body
 					// to enable dynamic determination of response body
 					debug("execute function responseBody() since responseBody was determined to be a function");
-					ctx.body = scenario.responseBody(ctx.request.headers, ctx.request.body, ctx.request.query);
+					ctx.body = scenario.responseBody(ctx.request.headers, ctx.request.body, _params);
 				} else if (scenario.responseBody) {
 					debug("assign responseBody without evaluation");
 					ctx.body = scenario.responseBody;
@@ -472,7 +472,7 @@ class Stubr {
 				 const _scenarioMatch: Stubr.Scenario | undefined = _filteredScenarios.find((scenario: Stubr.Scenario): boolean => {
 					if (typeof scenario.validate == "function") {
 						debug(`execute function validate() for scenario with name "${scenario.name}"`);
-						const _isValid = scenario.validate(ctx.request.headers, ctx.request.body, ctx.request.query);
+						const _isValid = scenario.validate(ctx.request.headers, ctx.request.body, _params);
 	
 						if (_isValid) {
 							debug(`found match for scenario with name "${scenario.name}"`);
