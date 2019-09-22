@@ -1,6 +1,6 @@
 {
   "name": "stubr",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "A flexibile mock server allowing validation based automatic resolving as well as manual resolving through interceptions.",
   "main": "dist/stubr.common.js",
   "types": "dist/globals.d.ts",
