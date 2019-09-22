@@ -79,7 +79,7 @@ const actions: ActionTree<RootState, RootState> = {
 				socket = io("http://localhost:3000");
 			} else {
 				let _path: string = "/socket.io";
-				if (window && window.location) {
+				if (window && window.location && window.location.pathname !== "/") {
 					_path = window.location.pathname + _path;
 				}
 				socket = io({ path: _path });
