@@ -130,11 +130,11 @@ The combination of `route` and `method` determines which scenarios are selected 
 
 `delay` can can be set to delay the response by x ms. Since requests to Stubr are usually answered within a few milliseconds, this attribute can optionally be used to match the expected performance of stubed APIs more realistically.
 
-The `responseHeaders` attribute can either be a static response object or optionally receive a function `responseHeaders: (requestHeaders, requestBody, requestParams) => object` to dynamically construct the response headers object based on request.
+The `responseHeaders` attribute can either be a static response object or optionally receive a function `responseHeaders: (requestHeaders, requestBody, requestParams) => object` to dynamically construct the response headers object based on request. In case of request body being XML, it is made available as JSON structure for POST, PUT and PATCH as method.
 
 The `responseFilePath` attribute defines the path to a static file to be exposed as response. The path needs to be a string and is interpreted relative to the script file, which defines the `register()` function. The file type of referenced file is being used to auto populate the `Content-Type` response header. If `responseFilePath` is specified, then a potentially additionally defined `responseBody` would be ignored.
 
-The `responseBody` attribute can either be a static response object or optionally receive a function `responseBody: (requestHeaders, requestBody, requestParams) => object` to dynamically construct the response body based on request.
+The `responseBody` attribute can either be a static response object or optionally receive a function `responseBody: (requestHeaders, requestBody, requestParams) => object` to dynamically construct the response body based on request. In case of request body being XML, it is made available as JSON structure for POST, PUT and PATCH as method.
 
 ## Monitoring, UI
 
