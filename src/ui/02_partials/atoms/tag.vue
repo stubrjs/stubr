@@ -140,5 +140,24 @@
                 }
             }
         }
+
+        &.yellow {
+            color: $c-yellow;
+            background: lighten($c-yellow, 40%);
+
+            &:hover {
+                background: lighten($c-yellow, 40%);
+            }
+
+            &.active {
+                color: #fff;
+                background: $c-yellow;
+                box-shadow: 0 1px 7px 0 #FF920066;
+
+                &:hover {
+                    background: lighten($c-yellow, 5%);
+                }
+            }
+        }
     }
 </style>

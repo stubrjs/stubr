@@ -91,6 +91,8 @@
 						return 'get';
 					case "PUT":
 						return 'put';
+					case "PATCH":
+						return 'patch';
 					case "DELETE":
 						return 'delete';
 					default:
@@ -105,6 +107,8 @@
 						return 'green';
 					case "PUT":
 						return 'purple';
+					case "PATCH":
+						return 'yellow';
 					case "DELETE":
 						return 'red';
 					default:
@@ -177,6 +181,10 @@
 
 				&.put {
 					color: $c-route-put;
+				}
+
+				&.patch {
+					color: $c-route-patch;
 				}
 
 				&.delete {

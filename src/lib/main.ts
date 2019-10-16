@@ -185,6 +185,29 @@ class Stubr {
 		return _routeConfigurations;
 	}
 
+	private isRouteMatch (incomingRoute: string, toBeMatchedRoute: string) {
+		const _segmentedToBeMatchedRoute: Array<String> = toBeMatchedRoute.split('/');
+		const _segmentedIncomingRoute: Array<String> = incomingRoute.split('/');
+
+		if (_segmentedToBeMatchedRoute.length !== _segmentedIncomingRoute.length) {
+			debug(`[route match] incoming route "${incomingRoute}" does not match scenario route "${toBeMatchedRoute}" because of varying route lengths`);
+			return false;
+		}
+
+		let _isMatch = true;
+		_segmentedIncomingRoute.forEach((segment, index) => {
+			if ((segment && !_segmentedToBeMatchedRoute[index]) || 
+				(_segmentedToBeMatchedRoute[index] !== segment && !(_segmentedToBeMatchedRoute[index].startsWith('{') && _segmentedToBeMatchedRoute[index].endsWith('}')))) {
+				debug(`[route match] segment "${segment}" of incoming route "${incomingRoute}" does not match scenario route segment "${_segmentedToBeMatchedRoute[index]}" of scenario route "${toBeMatchedRoute}"`);
+				_isMatch = false;
+			}
+		});
+
+		debug(`[route match] incoming route "${incomingRoute}" matches with scenario route "${toBeMatchedRoute}"`);
+
+		return _isMatch;
+	}
+
 	// filter scenarios by matching route and method
 	private getScenarioMatchesForRouteAndMethod (route: string, method: Method): Stubr.Scenario[] {
 		return filter(this.scenarios, (scenario) => {
@@ -192,19 +215,7 @@ class Stubr {
 				return false;
 			}
 
-			const _segmentedScenarioRoute: Array<String> = scenario.route.split('/');
-			const _segmentedRequestRoute: Array<String> = route.split('/');
-
-			let _isMatch = true;
-			_segmentedRequestRoute.forEach((segment, index) => {
-				if ((segment && !_segmentedScenarioRoute[index]) || 
-					(_segmentedScenarioRoute[index] !== segment && !(_segmentedScenarioRoute[index].startsWith('{') && _segmentedScenarioRoute[index].endsWith('}')))) {
-					debug(`scenario segment "${_segmentedScenarioRoute[index]}" does not match "${segment}"`);
-					_isMatch = false;
-				}
-			});
-
-			return _isMatch;
+			return this.isRouteMatch(route, scenario.route);
 		});
 	}
 
@@ -233,7 +244,7 @@ class Stubr {
 
 	private isInterceptedForRouteAndMethod (route: string, method: Method): boolean {
 		const _foundRouteConfiguration = this.getRouteConfigurationState().find((routeConfiguration: Stubr.RouteConfiguration) => {
-			return routeConfiguration.route == route;
+			return this.isRouteMatch(route, routeConfiguration.route);
 		});
 
 		if (_foundRouteConfiguration) {

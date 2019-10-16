@@ -52,6 +52,23 @@ stubr.register({
 	}
 });
 
+stubr.register({
+	group: "MyGroup",
+	name: "Test Patch",
+	route: "/test-patch",
+	method: Method.PATCH,
+	validate: (headers: object, body: object) => {
+		return true;
+	},
+	responseCode: 200,
+	responseBody: (headers: object, body: object) => {
+		return {
+			...body,
+			data: "yay, dynamic body"
+		}
+	}
+});
+
 // example for dynamic headers, route params and query params
 stubr.register({
 	group: "MyGroup",
