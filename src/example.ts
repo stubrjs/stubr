@@ -88,12 +88,12 @@ stubr.register({
 	responseCode: 200,
 	responseBody: (headers: object, body: object, params: object) => {
 		return `
-			<html>
-				<head></head>
-				<body>
-					<p>Hello World</p>
-				</body>
-			</html>
+<html>
+	<head></head>
+	<body>
+		<p>Hello World</p>
+	</body>
+</html>
 		`
 	}
 });

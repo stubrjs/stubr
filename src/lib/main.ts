@@ -9,6 +9,8 @@ import * as koaServe_ from 'koa-static';
 const koaServe = koaServe_;
 import * as bodyParser_ from 'koa-bodyparser';
 const bodyParser = bodyParser_;
+import * as xmlParser_ from 'koa-xml-body';
+const xmlParser = xmlParser_;
 import * as socketIo_ from 'socket.io';
 const socketIo = socketIo_;
 import { filter, remove, cloneDeep } from 'lodash';
@@ -52,6 +54,12 @@ class Stubr {
 
 	private initMockServer () {
 		debug(`current working dir: "${path.resolve(process.cwd())}"`);
+		this.mockServer.use(xmlParser({
+			onerror: (err, ctx) => {
+				// @ts-ignore
+				logger.warn(`failed to parse body as xml with status "${err.status}" and message "${err.message}"`);
+			}
+		}));
 		this.mockServer.use(bodyParser());
 	}
 
