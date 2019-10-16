@@ -49,7 +49,9 @@
 					case "GET":
 						return 'green';
 					case "PUT":
-						return 'purple';
+                        return 'purple';
+                    case "PATCH":
+                        return 'yellow';
 					case "DELETE":
 						return 'red';
 					default:
