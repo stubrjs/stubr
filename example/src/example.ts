@@ -1,5 +1,5 @@
-import Stubr from './lib/main';
-import { Method } from './lib/main';
+import Stubr from 'stubr';
+import { Method } from 'stubr';
 
 const stubr = new Stubr();
 

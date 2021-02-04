@@ -74,7 +74,7 @@
 	import ScenarioSelector from '../molecules/scenario-selector.vue';
 	import Tag from '../atoms/tag.vue';
 	import Icon from '../atoms/icon.vue';
-	import { LogEntryLocal } from '../../interfaces/events';
+	import { LogEntryLocal } from '../../@types/events';
 
 	export default Vue.extend({
 		props: {

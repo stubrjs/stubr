@@ -3,8 +3,5 @@
 	"compilerOptions": {
 		"module": "amd",
 		"sourceMap": false
-	},
-	"files": [
-		"src/lib/main.ts"
-	]
+	}
 }

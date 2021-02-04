@@ -21,7 +21,7 @@
 <script lang="ts">
     import Vue from 'vue';
     import { mapGetters } from 'vuex';
-    import * as pjson from '../../../../package.json';
+    import pkg from '../../../../package.json';
 
     export default Vue.extend({
         computed: {
@@ -29,7 +29,7 @@
                 'connected'
             ]),
             version () {
-                return (<any>pjson).version;
+                return pkg?.version;
             }
         }
     });

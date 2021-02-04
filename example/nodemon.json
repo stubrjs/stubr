@@ -2,5 +2,7 @@
 	"watch": ["src"],
 	"ext": "ts",
 	"ignore": ["src/**/*.spec.ts"],
-	"exec": "ts-node ./src/example.ts"
+	"execMap": {
+		"ts": "node -r ts-node/register"
+	}
 }
