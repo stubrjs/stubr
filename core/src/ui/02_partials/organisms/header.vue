@@ -3,9 +3,8 @@
         <div class="inner">
             <div class="logo">
                 <div>
-                    <img src="../../00_assets/img/logo.png" />
+                    <img src="../../00_assets/img/logo.png" srcset="../../00_assets/img/logo.png 1x, ../../00_assets/img/logo@2x.png 2x" />
                 </div>
-                <div class="name">Stubr</div>
             </div>
             <div>
                 <span 
@@ -63,7 +62,6 @@
 
                 img {
                     display: block;
-                    width: 35px;
                 }
 
                 .name {
