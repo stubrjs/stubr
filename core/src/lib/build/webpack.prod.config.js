@@ -33,11 +33,10 @@ module.exports = {
     },
     externals: [nodeExternals()],
     plugins: [
-        new CopyPlugin([
-            { 
-                from: path.resolve(__dirname, '../globals.d.ts'), 
-                to: path.resolve(process.cwd(), './dist') 
-            }
-        ])
+        new CopyPlugin({
+            patterns: [
+                { from: path.resolve(__dirname, '../globals.d.ts'), to: path.resolve(process.cwd(), './dist') }
+            ]
+        })
     ]
 };

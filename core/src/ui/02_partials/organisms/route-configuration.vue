@@ -19,8 +19,8 @@
     import Vue from 'vue';
     import { mapActions } from 'vuex';
     import Tag from '../atoms/tag.vue';
-    import { Method } from '../../interfaces/enums';
-    import { RouteConfiguration, MethodContext } from '../../interfaces/events';
+    import { Method } from '../../@types/enums';
+    import { RouteConfiguration, MethodContext } from '../../@types/events';
 
     export default Vue.extend({
         props: {

@@ -23,6 +23,8 @@ export default Stubr;
 export as namespace Stubr;
 
 export enum Method {
+	OPTIONS = "OPTIONS",
+	HEAD = "HEAD",
 	GET = "GET",
 	POST = "POST",
 	PUT = "PUT",

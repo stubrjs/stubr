@@ -1,5 +1,3 @@
-/// <reference path="main.d.ts" />
-
 const debug = require('debug')('stubr');
 import * as fs from 'fs';
 import * as path from 'path';
@@ -11,27 +9,28 @@ import * as bodyParser_ from 'koa-bodyparser';
 const bodyParser = bodyParser_;
 import * as xmlParser_ from 'koa-xml-body';
 const xmlParser = xmlParser_;
-import * as socketIo_ from 'socket.io';
-const socketIo = socketIo_;
+import { Server, Socket } from 'socket.io';
 import { filter, remove, cloneDeep } from 'lodash';
 import uuid = require('uuid/v4');
-import * as stackTrace from 'stack-trace';
+const stackTrace = require('stack-trace');
+import * as http from 'http';
 
-import { Method, EventType, ErrorCode } from './enums';
 import * as defaultConfig from './defaultconfig.json';
-import * as pjson from '../../package.json';
+import * as pjson from '../../../package.json';
 
-class Stubr {
-	private stubrConfig: Stubr.Config = {};
+import { Method, ErrorCode, EventType } from './@types/enums';
+
+class Stubr implements IStubr {
+	private stubrConfig: Config = {};
 	private mockServer: Koa = new Koa();
-	private uiServer: Koa = new Koa();
-	private io: SocketIO.Server = socketIo();
-	private scenarios: Stubr.Scenario[] = [];
-	private routeConfigurations: Stubr.RouteConfiguration[] = [];
-	private interceptionMarkers: Stubr.RouteInterceptionMarkerAudit[] = [];
-	private interceptions: Stubr.RouteInterceptions = {};
+	private uiServer: http.Server | undefined;
+	private io: Server | undefined;
+	private scenarios: Scenario[] = [];
+	private routeConfigurations: RouteConfiguration[] = [];
+	private interceptionMarkers: RouteInterceptionMarkerAudit[] = [];
+	private interceptions: RouteInterceptions = {};
 
-	constructor (stubrConfig?: Stubr.Config) {
+	constructor (stubrConfig?: Config) {
 		this.loadConfiguration(stubrConfig);
 		this.initMockServer();
 		this.initUiServer();
@@ -42,13 +41,13 @@ class Stubr {
 		this.interceptions = {};
 	}
 
-	private loadConfiguration (stubrConfig?: Stubr.Config) {
+	private loadConfiguration (stubrConfig?: Config) {
 		if (stubrConfig) {
 			debug('use custom config');
 			this.stubrConfig = {...defaultConfig, ...stubrConfig};
 		} else {
 			debug('use default config');
-			this.stubrConfig = <Stubr.Config>defaultConfig;
+			this.stubrConfig = <Config>defaultConfig;
 		}
 	}
 
@@ -75,11 +74,13 @@ class Stubr {
 		debug(`serve static files from "${_staticFilesDirectory}"`);
 		app.use(koaServe(_staticFilesDirectory));
 		this.uiServer = require('http').createServer(app.callback());
-		this.io = socketIo(this.uiServer);
+		if (this.uiServer) {
+			this.io = new Server(this.uiServer);
+		}
 	}
 
 	private startUiServer () {
-		this.uiServer.listen(this.stubrConfig.uiPort, () => {
+		this.uiServer?.listen(this.stubrConfig.uiPort, () => {
 			logger.info(`started stubr UI on port: ${this.stubrConfig.uiPort}`);
 
 			this.bindSocketIoListeners();
@@ -87,27 +88,27 @@ class Stubr {
 	}
 
 	private bindSocketIoListeners () {
-		this.io.on(EventType.CONNECT, (socket: any) => {
+		this.io?.on(EventType.CONNECT, (socket: Socket) => {
 			debug('[io] new client connected:', socket.id);
 
-			this.getRouteConfigurationState().forEach((routeConfig: Stubr.RouteConfiguration) => {
+			this.getRouteConfigurationState().forEach((routeConfig: RouteConfiguration) => {
 				debug(`[io] emit event "${EventType.ROUTE_CONFIG}" with payload:`, routeConfig);
 				socket.emit(EventType.ROUTE_CONFIG, routeConfig);
 			});
 
-			socket.on(EventType.MARK_ROUTE_FOR_INTERCEPTIONS, (event: Stubr.RouteInterceptionMarker, ack: Function) => {
+			socket.on(EventType.MARK_ROUTE_FOR_INTERCEPTIONS, (event: RouteInterceptionMarker, ack: Function) => {
 				debug(`[io] received route interception event from client "${socket.id}":`, event);
 				this.setRouteInterceptionMarker(socket.id, event);
-				const _foundRouteConfiguration = this.getRouteConfigurationState().find((routeConfiguration: Stubr.RouteConfiguration) => {
+				const _foundRouteConfiguration = this.getRouteConfigurationState().find((routeConfiguration: RouteConfiguration) => {
 					return routeConfiguration.id == event.routeConfigurationId;
 				});
 				ack(_foundRouteConfiguration); 
 
 				// notify all
-				this.io.emit(EventType.ROUTE_CONFIG, _foundRouteConfiguration);
+				this.io?.emit(EventType.ROUTE_CONFIG, _foundRouteConfiguration);
 			});
 
-			socket.on(EventType.RESOLVE_INTERCEPTION, (event: Stubr.ResolveInterception) => {
+			socket.on(EventType.RESOLVE_INTERCEPTION, (event: ResolveInterception) => {
 				if (event.logEntryId && event.scenarioId) {
 					if (typeof this.interceptions[event.logEntryId] == "function") {
 						this.interceptions[event.logEntryId](event.scenarioId);
@@ -130,7 +131,7 @@ class Stubr {
 	// extract covered route configurations from scenarios
 	private extractRouteConfigurations(): void {
 		const _routeMap: { [route: string]: Method[] }  = {};
-		this.scenarios.forEach((scenario: Stubr.Scenario) => {
+		this.scenarios.forEach((scenario: Scenario) => {
 			if (!_routeMap[scenario.route]) {
 				_routeMap[scenario.route] = [scenario.method];
 			} else {
@@ -138,11 +139,11 @@ class Stubr {
 			}
 		});
 	
-		const _routeConfigurations: Stubr.RouteConfiguration[] = [];
+		const _routeConfigurations: RouteConfiguration[] = [];
 		for (let route in _routeMap) {
 			const _methodsArray = _routeMap[route];
 	
-			const _methodsArrayWithInterceptionState: Array<Stubr.MethodContext> = [];
+			const _methodsArrayWithInterceptionState: Array<MethodContext> = [];
 			_methodsArray.forEach((method: string) => {
 				const _foundEntry = _methodsArrayWithInterceptionState.find((entry: any): boolean => {
 					return entry.method == method;
@@ -165,13 +166,13 @@ class Stubr {
 		this.routeConfigurations = _routeConfigurations;
 	}
 
-	private getRouteConfigurationState(): Stubr.RouteConfiguration[] {
+	private getRouteConfigurationState(): RouteConfiguration[] {
 		const _routeConfigurations = cloneDeep(this.routeConfigurations);
 
-		this.interceptionMarkers.forEach((interception: Stubr.RouteInterceptionMarkerAudit): void => {
-			_routeConfigurations.find((routeConfiguration: Stubr.RouteConfiguration): boolean => {
+		this.interceptionMarkers.forEach((interception: RouteInterceptionMarkerAudit): void => {
+			_routeConfigurations.find((routeConfiguration: RouteConfiguration): boolean => {
 				if (routeConfiguration.id == interception.routeConfigurationId) {
-					routeConfiguration.methods.forEach((methodContext: Stubr.MethodContext) => {
+					routeConfiguration.methods.forEach((methodContext: MethodContext) => {
 						if (methodContext.method == interception.method) {
 							methodContext.intercepted = interception.intercepted;
 						}
@@ -209,7 +210,7 @@ class Stubr {
 	}
 
 	// filter scenarios by matching route and method
-	private getScenarioMatchesForRouteAndMethod (route: string, method: Method): Stubr.Scenario[] {
+	private getScenarioMatchesForRouteAndMethod (route: string, method: Method): Scenario[] {
 		return filter(this.scenarios, (scenario) => {
 			if (scenario.method !== method) {
 				return false;
@@ -219,7 +220,7 @@ class Stubr {
 		});
 	}
 
-	private extractPathParams (route: string, scenario: Stubr.Scenario): object {
+	private extractPathParams (route: string, scenario: Scenario): object {
 		if (!route || !scenario) {
 			return {};
 		}
@@ -243,12 +244,12 @@ class Stubr {
 	}
 
 	private isInterceptedForRouteAndMethod (route: string, method: Method): boolean {
-		const _foundRouteConfiguration = this.getRouteConfigurationState().find((routeConfiguration: Stubr.RouteConfiguration) => {
+		const _foundRouteConfiguration = this.getRouteConfigurationState().find((routeConfiguration: RouteConfiguration) => {
 			return this.isRouteMatch(route, routeConfiguration.route);
 		});
 
 		if (_foundRouteConfiguration) {
-			return _foundRouteConfiguration.methods.find((methodContext: Stubr.MethodContext) => {
+			return _foundRouteConfiguration.methods.find((methodContext: MethodContext) => {
 				return methodContext.method == method && methodContext.intercepted == true;
 			}) !== undefined;
 		}
@@ -256,9 +257,9 @@ class Stubr {
 		return false;
 	}
 
-	private setRouteInterceptionMarker (socketId: string, routeInterception: Stubr.RouteInterceptionMarker): void {
+	private setRouteInterceptionMarker (socketId: string, routeInterception: RouteInterceptionMarker): void {
 		if (routeInterception.intercepted) {
-			const _interception: Stubr.RouteInterceptionMarkerAudit | undefined = this.interceptionMarkers.find((interception: Stubr.RouteInterceptionMarkerAudit): boolean => {
+			const _interception: RouteInterceptionMarkerAudit | undefined = this.interceptionMarkers.find((interception: RouteInterceptionMarkerAudit): boolean => {
 				return interception.routeConfigurationId == routeInterception.routeConfigurationId && interception.method == routeInterception.method;
 			});
 
@@ -273,7 +274,7 @@ class Stubr {
 				});
 			}
 		} else {
-			remove(this.interceptionMarkers, (interception: Stubr.RouteInterceptionMarkerAudit) => {
+			remove(this.interceptionMarkers, (interception: RouteInterceptionMarkerAudit) => {
 				return interception.routeConfigurationId == routeInterception.routeConfigurationId && interception.method == routeInterception.method;
 			});
 		}
@@ -281,19 +282,19 @@ class Stubr {
 	}
 
 	private unsetRouteInterceptionMarkersForSocketId(socketId: string) {
-		remove(this.interceptionMarkers, (interception: Stubr.RouteInterceptionMarkerAudit) => {
+		remove(this.interceptionMarkers, (interception: RouteInterceptionMarkerAudit) => {
 			return interception.socketId == socketId;
 		});
 		debug('route interception markers:', this.interceptionMarkers);
 
-		this.getRouteConfigurationState().forEach((routeConfig: Stubr.RouteConfiguration) => {
+		this.getRouteConfigurationState().forEach((routeConfig: RouteConfiguration) => {
 			debug(`[io] emit event "${EventType.ROUTE_CONFIG}" with payload:`, routeConfig);
 			
-			this.io.emit(EventType.ROUTE_CONFIG, routeConfig);
+			this.io?.emit(EventType.ROUTE_CONFIG, routeConfig);
 		});
 	}
 
-	public register(scenario: Stubr.Scenario): void {
+	public register(scenario: Scenario): void {
 
 		// extract caller file path
 		const _stackTrace = stackTrace.parse(new Error());
@@ -332,13 +333,13 @@ class Stubr {
 		// response
 
 		this.mockServer.use(async (ctx, next) => {
-			const _io: SocketIO.Server = this.io;
+			const _io: Server | undefined = this.io;
 
 			let _params = {
 				...ctx.request.query
 			}
 
-			async function seedResponseWithCase(ctx: any, scenario: Stubr.Scenario, logEntryId?: string): Promise<any> {
+			async function seedResponseWithCase(ctx: any, scenario: Scenario, logEntryId?: string): Promise<any> {
 				if (scenario.group) {
 					ctx.set('X-Stubr-Case-Group', scenario.group);
 				}
@@ -407,7 +408,7 @@ class Stubr {
 					ctx.body = scenario.responseBody;
 				}
 
-				const _logEntry: Stubr.LogEntry = {
+				const _logEntry: LogEntry = {
 					id: logEntryId || uuid(),
 					group: scenario.group,
 					name: scenario.name,
@@ -432,11 +433,11 @@ class Stubr {
 				}
 
 				debug(`[io] emit event "${EventType.LOG_ENTRY}" with payload:`, _logEntry);
-				_io.emit(EventType.LOG_ENTRY, _logEntry);
+				_io?.emit(EventType.LOG_ENTRY, _logEntry);
 				logger.info(JSON.stringify(_logEntry));
 			}
 
-			const _filteredScenarios: Stubr.Scenario[] = this.getScenarioMatchesForRouteAndMethod(ctx.path, <Method>ctx.method);
+			const _filteredScenarios: Scenario[] = this.getScenarioMatchesForRouteAndMethod(ctx.path, <Method>ctx.method);
 			
 			// merge path params with query params
 			if (_filteredScenarios && _filteredScenarios.length > 0) {
@@ -447,7 +448,7 @@ class Stubr {
 			}
 
 			if (this.isInterceptedForRouteAndMethod(ctx.path, <Method>ctx.method)) {
-				const _logEntry: Stubr.LogEntry = {
+				const _logEntry: LogEntry = {
 					id: uuid(),
 					route: ctx.path,
 					method: <Method>ctx.method,
@@ -457,7 +458,7 @@ class Stubr {
 						body: ctx.request.body,
 						params: _params
 					},
-					scenarios: _filteredScenarios.map((scenario: Stubr.Scenario): { id: string | undefined, group: string | undefined, name: string } => {
+					scenarios: _filteredScenarios.map((scenario: Scenario): { id: string | undefined, group: string | undefined, name: string } => {
 						return {
 							id: scenario.id,
 							group: scenario.group,
@@ -467,12 +468,12 @@ class Stubr {
 				};
 
 				debug(`[io] emit event "${EventType.LOG_ENTRY}" with payload:`, _logEntry);
-				this.io.emit(EventType.LOG_ENTRY, _logEntry);
+				this.io?.emit(EventType.LOG_ENTRY, _logEntry);
 				logger.info(JSON.stringify(_logEntry));
 
-				await new Promise((resolve) => {
+				await new Promise<void>((resolve) => {
 					this.interceptions[_logEntry.id] = (scenarioId: string) => {
-						const _selectedScenario: Stubr.Scenario | undefined = _filteredScenarios.find((scenario: Stubr.Scenario): boolean => {
+						const _selectedScenario: Scenario | undefined = _filteredScenarios.find((scenario: Scenario): boolean => {
 							return scenario.id == scenarioId;
 						});
 
@@ -488,7 +489,7 @@ class Stubr {
 					debug(`currently intercepted requests: ${Object.keys(this.interceptions)}`);
 				});
 			} else {
-				 const _scenarioMatch: Stubr.Scenario | undefined = _filteredScenarios.find((scenario: Stubr.Scenario): boolean => {
+				 const _scenarioMatch: Scenario | undefined = _filteredScenarios.find((scenario: Scenario): boolean => {
 					if (typeof scenario.validate == "function") {
 						debug(`execute function validate() for scenario with name "${scenario.name}"`);
 						const _isValid = scenario.validate(ctx.request.headers, ctx.request.body, _params);
@@ -507,7 +508,7 @@ class Stubr {
 				if (_scenarioMatch) {
 					if (_scenarioMatch.delay && typeof _scenarioMatch.delay == "number" ) {
 						debug(`waiting for ${_scenarioMatch.delay}ms before resolving request...`);
-						await new Promise((resolve) => {
+						await new Promise<void>((resolve) => {
 							setTimeout(() => {
 								debug(`proceeding with resolving request`);
 								resolve();
@@ -527,7 +528,7 @@ class Stubr {
 					ctx.body = { error: _errorMessage };
 					ctx.status = 404;
 	
-					const _logEntry: Stubr.LogEntry = {
+					const _logEntry: LogEntry = {
 						id: uuid(),
 						route: ctx.path,
 						method: <Method>ctx.method,
@@ -550,7 +551,7 @@ class Stubr {
 					};
 	
 					debug(`[io] emit event "${EventType.LOG_ENTRY}" with payload:`, _logEntry);
-					this.io.emit(EventType.LOG_ENTRY, _logEntry);
+					this.io?.emit(EventType.LOG_ENTRY, _logEntry);
 					logger.warn(JSON.stringify(_logEntry));
 	
 					return;
@@ -561,7 +562,7 @@ class Stubr {
 					ctx.body = { error: _errorMessage };
 					ctx.status = 404;
 	
-					const _logEntry: Stubr.LogEntry = {
+					const _logEntry: LogEntry = {
 						id: uuid(),
 						route: ctx.path,
 						method: <Method>ctx.method,
@@ -584,7 +585,7 @@ class Stubr {
 					};
 	
 					debug(`[io] emit event "${EventType.LOG_ENTRY}" with payload:`, _logEntry);
-					this.io.emit(EventType.LOG_ENTRY, _logEntry);
+					this.io?.emit(EventType.LOG_ENTRY, _logEntry);
 					logger.warn(JSON.stringify(_logEntry));
 				}
 			}

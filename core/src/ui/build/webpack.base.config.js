@@ -1,8 +1,6 @@
 const path = require('path');
 const VueLoaderPlugin = require('vue-loader/lib/plugin');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
-const HtmlWebpackHarddiskPlugin = require('html-webpack-harddisk-plugin');
-const FaviconsWebpackPlugin = require('favicons-webpack-plugin');
+const HtmlWebpackPlugin = require('html-webpack-plugin')
 
 module.exports = {
     entry: {
@@ -25,7 +23,8 @@ module.exports = {
             },
             {
 	            test: /\.ts$/,
-	            loader: 'ts-loader',
+                loader: 'ts-loader',
+                exclude: /node_modules/,
 	            options: {
 	            	appendTsSuffixTo: [/\.vue$/],
                     configFile: './tsconfig.json'
@@ -45,10 +44,8 @@ module.exports = {
                 }]
             },
             {
-                test: /\.(png|jpg|gif)$/,
-                use: [
-                    'file-loader'
-                ]
+                test: /\.(png|jpg|jpeg|gif)$/i,
+                type: 'asset/resource'
             }
         ]
     },
@@ -60,16 +57,13 @@ module.exports = {
     },
     plugins: [
         new VueLoaderPlugin(),
-        new FaviconsWebpackPlugin(path.join(__dirname, '../00_assets/img/logo.png')),
         new HtmlWebpackPlugin({
             template: 'src/ui/06_app/index.html',
             filename: 'index.html',
             hash: true,
             xhtml: true,
-            inject: false,
             alwaysWriteToDisk: true
-        }),
-        new HtmlWebpackHarddiskPlugin()
+        })
     ],
     performance: {
         hints: false

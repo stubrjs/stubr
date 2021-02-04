@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import Vuex, { MutationTree, ActionTree, GetterTree } from 'vuex';
-import * as io from 'socket.io-client';
+import { io } from 'socket.io-client/dist/socket.io.js';
 import { 
 	orderBy, 
 	findIndex,
@@ -12,8 +12,8 @@ import {
 	RouteInterception,
 	ResolveInterception,
 	MethodContext
-} from '../interfaces/events';
-import { EventType } from '../interfaces/enums';
+} from '../@types/events';
+import { EventType } from '../@types/enums';
 
 Vue.use(Vuex);
 
