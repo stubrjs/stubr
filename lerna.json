@@ -1,0 +1,12 @@
+{
+  "packages": [
+    "packages/*"
+  ],
+  "npmClient": "yarn",
+  "command": {
+    "run": {
+      "npmClient": "yarn"
+    }
+  },
+  "version": "0.5.0"
+}
