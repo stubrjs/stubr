@@ -18,13 +18,13 @@
 </template>
 
 <script lang="ts">
-import { find } from 'lodash'
-import uuid from 'uuid/v1'
-import Vue from 'vue'
-import { mapActions } from 'vuex'
-import Tag from '../atoms/tag.vue'
-import { Method } from '../../@types/enums'
-import { RouteConfiguration, MethodContext } from '../../@types/events'
+import { find } from 'lodash';
+import uuid from 'uuid/v1';
+import Vue from 'vue';
+import { mapActions } from 'vuex';
+import Tag from '../atoms/tag.vue';
+import { Method } from '../../@types/enums';
+import { RouteConfiguration, MethodContext } from '../../@types/events';
 
 export default Vue.extend({
     props: {
@@ -38,10 +38,10 @@ export default Vue.extend({
                 find(
                     this.routeConfiguration.methods,
                     (methodContext: MethodContext) => {
-                        return methodContext.intercepted
+                        return methodContext.intercepted;
                     }
                 ) != undefined || false
-            )
+            );
         }
     },
     methods: {
@@ -49,22 +49,22 @@ export default Vue.extend({
             toggleRouteInterception: 'toggleRouteInterception'
         }),
         getUuid(): string {
-            return uuid()
+            return uuid();
         },
         getTagColor(method: Method): string | void {
             switch (method) {
                 case 'POST':
-                    return 'blue'
+                    return 'blue';
                 case 'GET':
-                    return 'green'
+                    return 'green';
                 case 'PUT':
-                    return 'purple'
+                    return 'purple';
                 case 'PATCH':
-                    return 'yellow'
+                    return 'yellow';
                 case 'DELETE':
-                    return 'red'
+                    return 'red';
                 default:
-                    break
+                    break;
             }
         },
         handleRouteMethodClick(method: Method, intercepted: boolean): void {
@@ -72,13 +72,13 @@ export default Vue.extend({
                 routeConfigurationId: this.routeConfiguration.id,
                 method: method,
                 intercepted: intercepted
-            })
+            });
         }
     },
     components: {
         vTag: Tag
     }
-})
+});
 </script>
 
 <style lang="scss" scoped>
@@ -88,27 +88,29 @@ export default Vue.extend({
     display: flex;
     align-items: center;
     position: relative;
-    padding: 10px 15px;
-    border-bottom: 1px solid $c-tile-separator;
+    padding: 12px 0;
     border-left: 3px solid transparent;
 
     &.intercepted {
         &:after {
             position: absolute;
-            top: 25%;
-            left: 0;
+            top: 50%;
+            margin-top: -3px;
+            left: -20px;
             background: $c-interception;
-            width: 3px;
-            height: 50%;
+            box-shadow: 0 1px 7px 0 rgba(255, 104, 10, 0.5);
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
             content: '';
         }
     }
 
     .route {
         display: inline-block;
-        font-size: 14px;
-        padding-left: 10px;
-        padding-right: 40px;
+        font-size: 15px;
+        padding-left: 0;
+        padding-right: 30px;
         font-weight: 400;
     }
 

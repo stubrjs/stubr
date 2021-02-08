@@ -158,7 +158,7 @@ export default Vue.extend({
 .log-tile {
     border-radius: 5px;
     background: #fff;
-    box-shadow: 0 1px 5px 0 rgba(0, 0, 0, 0.15);
+    box-shadow: 0 7px 20px 0 rgba(0, 0, 0, 0.15);
 
     .head {
         display: flex;
@@ -166,7 +166,6 @@ export default Vue.extend({
         justify-content: space-between;
         height: 45px;
         padding: 10px;
-        border-bottom: 1px solid $c-tile-separator;
 
         .route-type {
             display: block;

@@ -41,8 +41,8 @@ export default Vue.extend({
         ...mapGetters(['routeConfigurations']),
         expandListLabel() {
             return (this as any).isListExpanded
-                ? 'show less routes'
-                : 'show all routes';
+                ? 'Show Less Routes'
+                : 'Show All Routes';
         },
         visibleRouteConfigurations() {
             if ((this as any).isListExpanded) {
@@ -136,9 +136,9 @@ export default Vue.extend({
             transition: all 0.2s;
             color: $c-highlight;
             font-size: 14px;
-            padding: 4px 15px;
+            padding: 10px 20px;
             border-radius: 3px;
-            background: none;
+            background: #f4f6ff;
             border: none;
             outline: 0;
 

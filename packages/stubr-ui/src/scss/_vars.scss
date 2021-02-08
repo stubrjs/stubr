@@ -1,15 +1,17 @@
 // colors
-$c-blue: #2b81fe;
-$c-green: #29d286;
-$c-red: #dd1515;
-$c-purple: #dd15d7;
-$c-yellow: #ffd800;
-$c-orange: #ff9200;
+$c-blue: #174dff;
+$c-green: #09e88b;
+$c-red: #ff120a;
+$c-purple: #a109e8;
+$c-yellow: #ffdf01;
+$c-orange: #ff680a;
 
-$c-background: #f5f5f5;
+$c-primary: $c-blue;
+
+$c-background: #fdffff;
 $c-reduced-presence-level-1: #afafaf;
-$c-reduced-presence-level-2: #f9f9f9;
-$c-tile-separator: #eee;
+$c-reduced-presence-level-2: #f7f8f9;
+$c-tile-separator: $c-primary;
 $c-highlight: $c-blue;
 $c-error: $c-red;
 $c-success: $c-green;
@@ -22,4 +24,7 @@ $c-route-patch: $c-yellow;
 
 // layout
 $l-max-content-width: 1024px;
-$l-header-height: 60px;
+$l-header-height: 40px;
+
+$l-tag-box-shadow: 0 1px 13px 0 rgba(100, 100, 100, 0.25);
+$l-tag-box-shadow-hover: 0 1px 7px 0 rgba(100, 100, 100, 0.3);

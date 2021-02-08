@@ -105,7 +105,6 @@ export default Vue.extend({
 @import '@/scss/main';
 
 .formatted-payload {
-    border: 1px solid $c-tile-separator;
     background: $c-reduced-presence-level-2;
     border-radius: 5px;
     padding: 10px 10px 0 10px;

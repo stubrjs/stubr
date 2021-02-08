@@ -14,7 +14,7 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue'
+import Vue from 'vue';
 
 export default Vue.extend({
     props: {
@@ -31,7 +31,7 @@ export default Vue.extend({
             type: Boolean
         }
     }
-})
+});
 </script>
 
 <style lang="scss" scoped>
@@ -40,7 +40,7 @@ export default Vue.extend({
 .tag {
     display: inline-block;
     border-radius: 6px;
-    padding: 4px 9px;
+    padding: 6px 15px;
     font-size: 12px;
     background: #f5f5f5;
     font-weight: 500;
@@ -49,120 +49,121 @@ export default Vue.extend({
     letter-spacing: 0.5px;
 
     &.clickable {
+        box-shadow: $l-tag-box-shadow;
         pointer-events: auto;
         cursor: pointer;
     }
 
     &.green {
         color: $c-green;
-        background: lighten($c-green, 40%);
+        background: #fff;
 
         &:hover {
-            background: lighten($c-green, 35%);
+            box-shadow: $l-tag-box-shadow-hover;
         }
 
         &.active {
             color: #fff;
             background: $c-green;
-            box-shadow: 0 1px 7px 0 rgba(41, 208, 133, 0.4);
+            box-shadow: 0 1px 7px 0 rgba(9, 232, 139, 0.5);
 
             &:hover {
-                background: lighten($c-green, 5%);
+                background: lighten($c-green, 7%);
             }
         }
     }
 
     &.blue {
         color: $c-blue;
-        background: lighten($c-blue, 35%);
+        background: #fff;
 
         &:hover {
-            background: lighten($c-blue, 30%);
+            box-shadow: $l-tag-box-shadow-hover;
         }
 
         &.active {
             color: #fff;
             background: $c-blue;
-            box-shadow: 0 1px 7px 0 rgba(43, 129, 254, 0.4);
+            box-shadow: 0 1px 7px 0 rgba(23, 77, 255, 0.5);
 
             &:hover {
-                background: lighten($c-blue, 5%);
+                background: lighten($c-blue, 7%);
             }
         }
     }
 
     &.red {
         color: $c-red;
-        background: lighten($c-red, 45%);
+        background: #fff;
 
         &:hover {
-            background: lighten($c-red, 40%);
+            box-shadow: $l-tag-box-shadow-hover;
         }
 
         &.active {
             color: #fff;
             background: $c-red;
-            box-shadow: 0 1px 7px 0 #dd151566;
+            box-shadow: 0 1px 7px 0 rgba(255, 18, 10, 0.5);
 
             &:hover {
-                background: lighten($c-red, 5%);
+                background: lighten($c-red, 7%);
             }
         }
     }
 
     &.orange {
         color: $c-orange;
-        background: lighten($c-orange, 45%);
+        background: #fff;
 
         &:hover {
-            background: lighten($c-orange, 40%);
+            box-shadow: $l-tag-box-shadow-hover;
         }
 
         &.active {
             color: #fff;
             background: $c-orange;
-            box-shadow: 0 1px 7px 0 #ff920066;
+            box-shadow: 0 1px 7px 0 rgba(255, 104, 10, 0.5);
 
             &:hover {
-                background: lighten($c-orange, 5%);
+                background: lighten($c-orange, 7%);
             }
         }
     }
 
     &.purple {
         color: $c-purple;
-        background: lighten($c-purple, 45%);
+        background: #fff;
 
         &:hover {
-            background: lighten($c-purple, 40%);
+            box-shadow: $l-tag-box-shadow-hover;
         }
 
         &.active {
             color: #fff;
             background: $c-purple;
-            box-shadow: 0 1px 7px 0 #ff920066;
+            box-shadow: 0 1px 7px 0 rgba(161, 9, 232, 0.5);
 
             &:hover {
-                background: lighten($c-purple, 5%);
+                background: lighten($c-purple, 7%);
             }
         }
     }
 
     &.yellow {
         color: $c-yellow;
-        background: lighten($c-yellow, 40%);
+        background: #fff;
 
         &:hover {
-            background: lighten($c-yellow, 40%);
+            box-shadow: $l-tag-box-shadow-hover;
         }
 
         &.active {
             color: #fff;
             background: $c-yellow;
-            box-shadow: 0 1px 7px 0 #ff920066;
+            box-shadow: 0 1px 7px 0 rgba(255, 232, 1, 0.5);
 
             &:hover {
-                background: lighten($c-yellow, 5%);
+                background: lighten($c-yellow, 7%);
             }
         }
     }

@@ -10,29 +10,28 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue'
+import Vue from 'vue';
 
-export default Vue.extend({})
+export default Vue.extend({});
 </script>
 
 <style lang="scss" scoped>
 @import '@/scss/main';
 
 .section {
-    border-radius: 5px;
-    background: #fff;
-    box-shadow: 0 1px 1px 0 rgba(213, 213, 213, 0.5);
+    margin-top: 20px;
 
     .head {
-        padding: 10px;
-        border-bottom: 1px solid $c-tile-separator;
-        font-size: 15px;
+        padding: 20px 0;
+        //border-bottom: 2px solid $c-tile-separator;
+        font-size: 19px;
         font-weight: 500;
         letter-spacing: 0.6px;
+        color: #333;
     }
 
     .body {
-        padding: 20px 10px;
+        //padding: 20px 0;
     }
 }
 </style>

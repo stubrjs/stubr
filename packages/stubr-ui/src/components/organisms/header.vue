@@ -29,18 +29,18 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue'
-import { mapGetters } from 'vuex'
-import pkg from '../../../package.json'
+import Vue from 'vue';
+import { mapGetters } from 'vuex';
+import pkg from '../../../package.json';
 
 export default Vue.extend({
     computed: {
         ...mapGetters(['connected']),
         version() {
-            return pkg?.version
+            return pkg?.version;
         }
     }
-})
+});
 </script>
 
 <style lang="scss" scoped>
@@ -48,12 +48,11 @@ export default Vue.extend({
 
 .header {
     z-index: 1;
-    position: fixed;
+    position: relative;
     top: 0;
     left: 0;
     height: $l-header-height;
     width: 100%;
-    background: #fff;
 
     .inner {
         display: flex;
@@ -61,7 +60,6 @@ export default Vue.extend({
         justify-content: space-between;
         width: 100%;
         height: 100%;
-        padding: 0 20px;
         max-width: $l-max-content-width;
         margin: 0 auto;
 

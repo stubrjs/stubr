@@ -27,13 +27,13 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue'
-import { mapActions, mapGetters } from 'vuex'
+import Vue from 'vue';
+import { mapActions, mapGetters } from 'vuex';
 
-import Header from './components/organisms/header.vue'
-import RouteConfigurations from './components/organisms/route-configurations.vue'
-import LogTiles from './components/organisms/log-tiles.vue'
-import Section from './components/molecules/section.vue'
+import Header from './components/organisms/header.vue';
+import RouteConfigurations from './components/organisms/route-configurations.vue';
+import LogTiles from './components/organisms/log-tiles.vue';
+import Section from './components/molecules/section.vue';
 
 export default Vue.extend({
     computed: {
@@ -45,7 +45,7 @@ export default Vue.extend({
         })
     },
     mounted() {
-        this.initStore()
+        this.initStore();
     },
     components: {
         vHeader: Header,
@@ -53,14 +53,14 @@ export default Vue.extend({
         vLogTiles: LogTiles,
         vSection: Section
     }
-})
+});
 </script>
 
 <style lang="scss">
 @import './scss/main.scss';
 
 .entry {
-    padding: calc(#{$l-header-height} + 20px) 20px 20px 20px;
+    padding: 10px 30px;
     max-width: $l-max-content-width;
     margin: 0 auto;
 
