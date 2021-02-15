@@ -1,17 +1,7 @@
 <template>
     <div class="header">
         <div class="inner">
-            <div class="logo">
-                <div>
-                    <img
-                        src="@/assets/img/logo.png"
-                        srcset="
-                            @/assets/img/logo.png    1x,
-                            @/assets/img/logo@2x.png 2x
-                        "
-                    />
-                </div>
-            </div>
+            <div v-html="logo" class="logo"></div>
             <div>
                 <span
                     :class="{
@@ -32,8 +22,14 @@
 import Vue from 'vue';
 import { mapGetters } from 'vuex';
 import pkg from '../../../package.json';
+const Logo = require('@/assets/svg/logo.svg') as string;
 
 export default Vue.extend({
+    data() {
+        return {
+            logo: Logo
+        };
+    },
     computed: {
         ...mapGetters(['connected']),
         version() {
@@ -66,10 +62,8 @@ export default Vue.extend({
         .logo {
             display: flex;
             align-items: center;
-
-            img {
-                display: block;
-            }
+            width: 100px;
+            height: 40px;
 
             .name {
                 font-family: 'QuickSand';

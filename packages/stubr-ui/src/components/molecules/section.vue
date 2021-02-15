@@ -26,8 +26,8 @@ export default Vue.extend({});
         //border-bottom: 2px solid $c-tile-separator;
         font-size: 19px;
         font-weight: 500;
-        letter-spacing: 0.6px;
-        color: #333;
+        letter-spacing: 0.8px;
+        color: #636e91;
     }
 
     .body {

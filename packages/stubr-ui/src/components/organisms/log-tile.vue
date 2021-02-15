@@ -158,7 +158,7 @@ export default Vue.extend({
 .log-tile {
     border-radius: 5px;
     background: #fff;
-    box-shadow: 0 7px 20px 0 rgba(0, 0, 0, 0.15);
+    box-shadow: 0 7px 20px 0 rgba(0, 0, 0, 0.12);
 
     .head {
         display: flex;

@@ -6,16 +6,16 @@
             :log-entry="logEntry"
         ></v-log-tile>
         <div v-if="!logEntries || logEntries.length == 0" class="placeholder">
-            (no entries available, yet)
+            waiting for the first event ...
         </div>
     </div>
 </template>
 
 <script lang="ts">
-import Vue from 'vue'
-import { mapGetters } from 'vuex'
+import Vue from 'vue';
+import { mapGetters } from 'vuex';
 
-import LogTile from './log-tile.vue'
+import LogTile from './log-tile.vue';
 
 export default Vue.extend({
     computed: {
@@ -24,7 +24,7 @@ export default Vue.extend({
     components: {
         vLogTile: LogTile
     }
-})
+});
 </script>
 
 <style lang="scss" scoped>
@@ -32,6 +32,7 @@ export default Vue.extend({
 
 .log-tiles {
     width: 100%;
+    margin-bottom: 30px;
 
     .log-tile {
         margin-bottom: 20px;
@@ -42,9 +43,11 @@ export default Vue.extend({
     }
 
     .placeholder {
-        padding: 20px 0;
+        font-size: 17px;
+        letter-spacing: 0.2px;
+        padding: 80px 0;
         text-align: center;
-        color: $c-reduced-presence-level-1;
+        color: #b4bdd9;
     }
 }
 </style>
