@@ -3,13 +3,13 @@
         "module": "amd",
         "moduleResolution": "node",
         "target": "es5",
-        "noImplicitAny": false,
+        "noImplicitAny": true,
         "sourceMap": false,
         "experimentalDecorators": true,
         "resolveJsonModule": true,
         "strict": true
     },
     "typeRoots": ["./src/@types"],
-    "include": ["./src"],
+    "include": ["./src", "webpack.config.js"],
     "exclude": ["node_modules"]
 }

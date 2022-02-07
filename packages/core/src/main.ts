@@ -11,7 +11,7 @@ import * as xmlParser_ from 'koa-xml-body';
 const xmlParser = xmlParser_;
 import { Server, Socket } from 'socket.io';
 import { filter, remove, cloneDeep } from 'lodash';
-import uuid = require('uuid/v4');
+import { nanoid } from 'nanoid';
 const stackTrace = require('stack-trace');
 import * as http from 'http';
 
@@ -60,7 +60,7 @@ class Stubr implements IStubr {
                         // @ts-ignore
                         `failed to parse body as xml with status "${err?.status}" and message "${err?.message}"`
                     );
-                },
+                }
             })
         );
         this.mockServer.use(bodyParser());
@@ -82,8 +82,8 @@ class Stubr implements IStubr {
             this.io = new Server(this.uiServer, {
                 cors: {
                     origin: 'http://localhost:8080',
-                    methods: ['GET', 'POST'],
-                },
+                    methods: ['GET', 'POST']
+                }
             });
         }
     }
@@ -118,15 +118,14 @@ class Stubr implements IStubr {
                         event
                     );
                     this.setRouteInterceptionMarker(socket.id, event);
-                    const _foundRouteConfiguration =
-                        this.getRouteConfigurationState().find(
-                            (routeConfiguration: RouteConfiguration) => {
-                                return (
-                                    routeConfiguration.id ==
-                                    event.routeConfigurationId
-                                );
-                            }
-                        );
+                    const _foundRouteConfiguration = this.getRouteConfigurationState().find(
+                        (routeConfiguration: RouteConfiguration) => {
+                            return (
+                                routeConfiguration.id ==
+                                event.routeConfigurationId
+                            );
+                        }
+                    );
                     ack(_foundRouteConfiguration);
 
                     // notify all
@@ -149,9 +148,9 @@ class Stubr implements IStubr {
                                 event.scenarioId
                             );
                             debug(
-                                `currently intercepted requests: ${
-                                    Object.keys(this.interceptions) || 'none'
-                                }`
+                                `currently intercepted requests: ${Object.keys(
+                                    this.interceptions
+                                ) || 'none'}`
                             );
                         } else {
                             debug(
@@ -182,7 +181,7 @@ class Stubr implements IStubr {
             } else {
                 _routeMap[scenario.route] = [
                     ..._routeMap[scenario.route],
-                    scenario.method,
+                    scenario.method
                 ];
             }
         });
@@ -201,15 +200,15 @@ class Stubr implements IStubr {
                 if (!_foundEntry) {
                     _methodsArrayWithInterceptionState.push({
                         method: method,
-                        intercepted: false,
+                        intercepted: false
                     });
                 }
             });
 
             _routeConfigurations.push({
-                id: uuid(),
+                id: nanoid(),
                 route: route,
-                methods: _methodsArrayWithInterceptionState,
+                methods: _methodsArrayWithInterceptionState
             });
         }
 
@@ -250,8 +249,9 @@ class Stubr implements IStubr {
     }
 
     private isRouteMatch(incomingRoute: string, toBeMatchedRoute: string) {
-        const _segmentedToBeMatchedRoute: Array<String> =
-            toBeMatchedRoute.split('/');
+        const _segmentedToBeMatchedRoute: Array<String> = toBeMatchedRoute.split(
+            '/'
+        );
         const _segmentedIncomingRoute: Array<String> = incomingRoute.split('/');
 
         if (
@@ -292,7 +292,7 @@ class Stubr implements IStubr {
         route: string,
         method: Method
     ): Scenario[] {
-        return filter(this.scenarios, (scenario) => {
+        return filter(this.scenarios, scenario => {
             if (scenario.method !== method) {
                 return false;
             }
@@ -306,12 +306,13 @@ class Stubr implements IStubr {
             return {};
         }
 
-        const _pathParams = {};
-        const _segmentedScenarioRoute: Array<String> =
-            scenario.route.split('/');
-        const _segmentedRequestRoute: Array<String> = route.split('/');
+        const _pathParams: { [key: string]: string } = {};
+        const _segmentedScenarioRoute: Array<string> = scenario.route.split(
+            '/'
+        );
+        const _segmentedRequestRoute: Array<string> = route.split('/');
 
-        function isWildcard(segment) {
+        function isWildcard(segment: string) {
             if (!segment || typeof segment !== 'string') return false;
             return segment.startsWith('{') && segment.endsWith('}');
         }
@@ -361,16 +362,17 @@ class Stubr implements IStubr {
         routeInterception: RouteInterceptionMarker
     ): void {
         if (routeInterception.intercepted) {
-            const _interception: RouteInterceptionMarkerAudit | undefined =
-                this.interceptionMarkers.find(
-                    (interception: RouteInterceptionMarkerAudit): boolean => {
-                        return (
-                            interception.routeConfigurationId ==
-                                routeInterception.routeConfigurationId &&
-                            interception.method == routeInterception.method
-                        );
-                    }
-                );
+            const _interception:
+                | RouteInterceptionMarkerAudit
+                | undefined = this.interceptionMarkers.find(
+                (interception: RouteInterceptionMarkerAudit): boolean => {
+                    return (
+                        interception.routeConfigurationId ==
+                            routeInterception.routeConfigurationId &&
+                        interception.method == routeInterception.method
+                    );
+                }
+            );
 
             if (_interception) {
                 _interception.socketId = socketId;
@@ -380,7 +382,7 @@ class Stubr implements IStubr {
                         routeInterception.routeConfigurationId,
                     method: routeInterception.method,
                     intercepted: true,
-                    socketId: socketId,
+                    socketId: socketId
                 });
             }
         } else {
@@ -431,10 +433,10 @@ class Stubr implements IStubr {
 
         this.scenarios.push({
             ...scenario,
-            id: scenario.id ? scenario.id : uuid(),
+            id: scenario.id ? scenario.id : nanoid(),
             responseFilePath: scenario.responseFilePath
                 ? path.join(_callerFilePath, scenario.responseFilePath)
-                : scenario.responseFilePath,
+                : scenario.responseFilePath
         });
     }
 
@@ -462,7 +464,7 @@ class Stubr implements IStubr {
             const _io: Server | undefined = this.io;
 
             let _params = {
-                ...ctx.request.query,
+                ...ctx.request.query
             };
 
             async function seedResponseWithCase(
@@ -531,7 +533,7 @@ class Stubr implements IStubr {
                     } catch (err) {
                         _existsFile = false;
                         const _notfound = ['ENOENT', 'ENAMETOOLONG', 'ENOTDIR'];
-                        if (_notfound.includes(err.code)) {
+                        if (_notfound.includes((err as any)?.code)) {
                             logger.warn(
                                 `could not send file, since it was not found at path "${_filePath}" for scenario name "${scenario.name}"`
                             );
@@ -571,7 +573,7 @@ class Stubr implements IStubr {
                 }
 
                 const _logEntry: LogEntry = {
-                    id: logEntryId || uuid(),
+                    id: logEntryId || nanoid(),
                     group: scenario.group,
                     name: scenario.name,
                     route: scenario.route,
@@ -580,7 +582,7 @@ class Stubr implements IStubr {
                     request: {
                         headers: ctx.request.headers,
                         body: ctx.request.body,
-                        params: _params,
+                        params: _params
                     },
                     response: {
                         status: ctx.status,
@@ -589,8 +591,8 @@ class Stubr implements IStubr {
                             scenario.responseFilePath !== undefined &&
                             scenario.responseFilePath !== null &&
                             ctx.status < 400,
-                        body: ctx.body,
-                    },
+                        body: ctx.body
+                    }
                 };
 
                 if (
@@ -609,17 +611,16 @@ class Stubr implements IStubr {
                 logger.info(JSON.stringify(_logEntry));
             }
 
-            const _filteredScenarios: Scenario[] =
-                this.getScenarioMatchesForRouteAndMethod(
-                    ctx.path,
-                    <Method>ctx.method
-                );
+            const _filteredScenarios: Scenario[] = this.getScenarioMatchesForRouteAndMethod(
+                ctx.path,
+                <Method>ctx.method
+            );
 
             // merge path params with query params
             if (_filteredScenarios && _filteredScenarios.length > 0) {
                 _params = {
                     ...this.extractPathParams(ctx.path, _filteredScenarios[0]),
-                    ..._params,
+                    ..._params
                 };
             }
 
@@ -630,30 +631,26 @@ class Stubr implements IStubr {
                 )
             ) {
                 const _logEntry: LogEntry = {
-                    id: uuid(),
+                    id: nanoid(),
                     route: ctx.path,
                     method: <Method>ctx.method,
                     intercepted: true,
                     request: {
                         headers: ctx.request.headers,
                         body: ctx.request.body,
-                        params: _params,
+                        params: _params
                     },
-                    scenarios: _filteredScenarios.map(
-                        (
-                            scenario: Scenario
-                        ): {
-                            id: string | undefined;
-                            group: string | undefined;
-                            name: string;
-                        } => {
-                            return {
-                                id: scenario.id,
-                                group: scenario.group,
-                                name: scenario.name,
-                            };
-                        }
-                    ),
+                    scenarios: _filteredScenarios.map((scenario: Scenario): {
+                        id: string | undefined;
+                        group: string | undefined;
+                        name: string;
+                    } => {
+                        return {
+                            id: scenario.id,
+                            group: scenario.group,
+                            name: scenario.name
+                        };
+                    })
                 };
 
                 debug(
@@ -663,14 +660,15 @@ class Stubr implements IStubr {
                 this.io?.emit(EventType.LOG_ENTRY, _logEntry);
                 logger.info(JSON.stringify(_logEntry));
 
-                await new Promise<void>((resolve) => {
+                await new Promise<void>(resolve => {
                     this.interceptions[_logEntry.id] = (scenarioId: string) => {
-                        const _selectedScenario: Scenario | undefined =
-                            _filteredScenarios.find(
-                                (scenario: Scenario): boolean => {
-                                    return scenario.id == scenarioId;
-                                }
-                            );
+                        const _selectedScenario:
+                            | Scenario
+                            | undefined = _filteredScenarios.find(
+                            (scenario: Scenario): boolean => {
+                                return scenario.id == scenarioId;
+                            }
+                        );
 
                         if (_selectedScenario) {
                             seedResponseWithCase(
@@ -696,8 +694,10 @@ class Stubr implements IStubr {
                     );
                 });
             } else {
-                const _scenarioMatch: Scenario | undefined =
-                    _filteredScenarios.find((scenario: Scenario): boolean => {
+                const _scenarioMatch:
+                    | Scenario
+                    | undefined = _filteredScenarios.find(
+                    (scenario: Scenario): boolean => {
                         if (typeof scenario.validate == 'function') {
                             debug(
                                 `execute function validate() for scenario with name "${scenario.name}"`
@@ -720,7 +720,8 @@ class Stubr implements IStubr {
                             );
                         }
                         return false;
-                    });
+                    }
+                );
 
                 // resolve match
                 if (_scenarioMatch) {
@@ -731,7 +732,7 @@ class Stubr implements IStubr {
                         debug(
                             `waiting for ${_scenarioMatch.delay}ms before resolving request...`
                         );
-                        await new Promise<void>((resolve) => {
+                        await new Promise<void>(resolve => {
                             setTimeout(() => {
                                 debug(`proceeding with resolving request`);
                                 resolve();
@@ -757,25 +758,25 @@ class Stubr implements IStubr {
                     ctx.status = 404;
 
                     const _logEntry: LogEntry = {
-                        id: uuid(),
+                        id: nanoid(),
                         route: ctx.path,
                         method: <Method>ctx.method,
                         intercepted: false,
                         request: {
                             headers: ctx.request.headers,
                             params: _params,
-                            body: ctx.request.body,
+                            body: ctx.request.body
                         },
                         response: {
                             status: ctx.status,
                             headers: ctx.response.headers,
                             hasSentFile: false,
-                            body: ctx.body,
+                            body: ctx.body
                         },
                         error: {
                             code: ErrorCode.NO_ROUTE_MATCH,
-                            message: _errorMessage,
-                        },
+                            message: _errorMessage
+                        }
                     };
 
                     debug(
@@ -794,25 +795,25 @@ class Stubr implements IStubr {
                     ctx.status = 404;
 
                     const _logEntry: LogEntry = {
-                        id: uuid(),
+                        id: nanoid(),
                         route: ctx.path,
                         method: <Method>ctx.method,
                         intercepted: false,
                         request: {
                             headers: ctx.request.headers,
                             body: ctx.request.body,
-                            params: _params,
+                            params: _params
                         },
                         response: {
                             status: ctx.status,
                             headers: ctx.response.headers,
                             hasSentFile: false,
-                            body: ctx.body,
+                            body: ctx.body
                         },
                         error: {
                             code: ErrorCode.NO_SCENARIO_MATCH,
-                            message: _errorMessage,
-                        },
+                            message: _errorMessage
+                        }
                     };
 
                     debug(
