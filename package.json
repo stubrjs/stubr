@@ -1,4 +1,12 @@
 {
-    "private": true,
-    "workspaces": ["core", "example"]
+  "name": "root",
+  "private": true,
+  "scripts": {
+    "dev:ui": "lerna run dev --scope @stubr/ui --stream",
+    "build:ui": "lerna run build --scope @stubr/ui --stream",
+    "build:stubr": "lerna run build --scope stubr --stream"
+  },
+  "devDependencies": {
+    "lerna": "^3.22.1"
   }
+}

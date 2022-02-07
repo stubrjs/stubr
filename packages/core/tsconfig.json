@@ -1,0 +1,15 @@
+{
+    "compilerOptions": {
+        "module": "amd",
+        "moduleResolution": "node",
+        "target": "es5",
+        "noImplicitAny": false,
+        "sourceMap": false,
+        "experimentalDecorators": true,
+        "resolveJsonModule": true,
+        "strict": true
+    },
+    "typeRoots": ["./src/@types"],
+    "include": ["./src"],
+    "exclude": ["node_modules"]
+}
