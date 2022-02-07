@@ -1,12 +1,13 @@
 // colors
-$c-blue: #174dff;
+$c-primary: #174dff;
+$c-secondary: #f23558;
+
+$c-blue: $c-primary;
 $c-green: #09e88b;
-$c-red: #ff120a;
+$c-red: $c-secondary;
 $c-purple: #a109e8;
 $c-yellow: #ffdf01;
 $c-orange: #ff680a;
-
-$c-primary: $c-blue;
 
 $c-background: #fcfeff;
 $c-reduced-presence-level-1: #afafaf;
