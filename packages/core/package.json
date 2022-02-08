@@ -1,6 +1,6 @@
 {
   "name": "stubr",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "description": "A flexibile mock server allowing validation based automatic resolving as well as manual resolving through interceptions.",
   "main": "dist/stubr.common.js",
   "types": "dist/globals.d.ts",
@@ -23,6 +23,7 @@
   ],
   "license": "MIT",
   "devDependencies": {
+    "@babel/core": "^7.17.0",
     "@babel/preset-typescript": "^7.16.7",
     "@stubr/ui": "^0.5.0",
     "@types/jest": "^27.4.0",
@@ -57,7 +58,7 @@
     "koa-xml-body": "^2.2.0",
     "lodash": "^4.17.20",
     "sass": "^1.32.6",
-    "socket.io": "^3.1.1",
+    "socket.io": "^4.4.1",
     "stack-trace": "^0.0.10",
     "winston": "^3.3.3",
     "winston-daily-rotate-file": "^4.5.0"

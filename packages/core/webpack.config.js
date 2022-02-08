@@ -28,7 +28,7 @@ module.exports = {
             }
         ]
     },
-    externals: [nodeExternals()],
+    externals: [nodeExternals(), 'utf-8-validate', 'bufferutil'],
     plugins: [
         new CopyPlugin({
             patterns: [

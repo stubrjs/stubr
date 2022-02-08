@@ -39,15 +39,27 @@ interface Scenario {
     method: Method;
     group?: string;
     delay?: number;
-    validate: (headers: object, body: object, params: object) => boolean;
+    validate: (
+        headers: { [key: string]: string },
+        body: any,
+        params: { [key: string]: string | string[] }
+    ) => boolean;
     responseCode: number;
     responseHeaders?:
         | { [key: string]: string }
-        | ((headers: object, body: object, params: object) => object);
+        | ((
+              headers: { [key: string]: string },
+              body: any,
+              params: { [key: string]: string | string[] }
+          ) => object);
     responseFilePath?: string;
     responseBody?:
         | object
-        | ((headers: object, body: object, params: object) => any);
+        | ((
+              headers: { [key: string]: string },
+              body: any,
+              params: { [key: string]: string | string[] }
+          ) => any);
 }
 
 interface LogEntry {
