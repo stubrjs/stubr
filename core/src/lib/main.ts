@@ -16,7 +16,7 @@ const stackTrace = require('stack-trace');
 import * as http from 'http';
 
 import * as defaultConfig from './defaultconfig.json';
-import * as pjson from '../../../package.json';
+import * as pjson from '../../package.json';
 
 import { Method, ErrorCode, EventType } from './@types/enums';
 
@@ -399,10 +399,18 @@ class Stubr implements IStubr {
 						ctx.body = { error: "file not found" }
 					}
 				} else if (typeof  scenario.responseBody == "function") {
-					// if responseBody is a function pass request headers and body
-					// to enable dynamic determination of response body
-					debug("execute function responseBody() since responseBody was determined to be a function");
-					ctx.body = scenario.responseBody(ctx.request.headers, ctx.request.body, _params);
+					// check if function returns a promise
+					if (scenario.responseBody.constructor.name === 'AsyncFunction' || typeof scenario.responseBody(ctx.request.headers, ctx.request.body, _params).then === 'function') {
+						// if responseBody is a function pass request headers and body
+						// to enable dynamic determination of response body
+						debug("execute function responseBody() since responseBody was determined to be an async function");
+						ctx.body = await scenario.responseBody(ctx.request.headers, ctx.request.body, _params);
+					} else {
+						// if responseBody is a function pass request headers and body
+						// to enable dynamic determination of response body
+						debug("execute function responseBody() since responseBody was determined to be a sync function");
+						ctx.body = scenario.responseBody(ctx.request.headers, ctx.request.body, _params);
+					}
 				} else if (scenario.responseBody) {
 					debug("assign responseBody without evaluation");
 					ctx.body = scenario.responseBody;
@@ -472,13 +480,13 @@ class Stubr implements IStubr {
 				logger.info(JSON.stringify(_logEntry));
 
 				await new Promise<void>((resolve) => {
-					this.interceptions[_logEntry.id] = (scenarioId: string) => {
+					this.interceptions[_logEntry.id] = async (scenarioId: string) => {
 						const _selectedScenario: Scenario | undefined = _filteredScenarios.find((scenario: Scenario): boolean => {
 							return scenario.id == scenarioId;
 						});
 
 						if (_selectedScenario) {
-							seedResponseWithCase(ctx, _selectedScenario, _logEntry.id);
+							await seedResponseWithCase(ctx, _selectedScenario, _logEntry.id);
 							resolve();
 							debug(`resolved interception for request with id "${_logEntry.id}" with scenario with id "${scenarioId}"`);
 							delete this.interceptions[_logEntry.id];
@@ -520,7 +528,7 @@ class Stubr implements IStubr {
 						logger.warn('property delay is only allowed to receive values of type "number"');
 					}
 
-					seedResponseWithCase(ctx, _scenarioMatch);
+					await seedResponseWithCase(ctx, _scenarioMatch);
 				}
 	
 				if (_filteredScenarios.length == 0) {

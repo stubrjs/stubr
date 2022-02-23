@@ -128,4 +128,23 @@ stubr.register({
 	responseFilePath: "dummy.pdf"
 });
 
+// async response body
+stubr.register({
+	group: "Async",
+	name: "Async Response body",
+	route: "/async-body",
+	method: Method.GET,
+	validate: (headers: object, body: object, params: object) => {
+		return true;
+	},
+	responseCode: 200,
+	responseBody: () => {
+		return new Promise((resolve) => {
+			setTimeout(() => {
+				resolve('Test 1234')
+			}, 2000)
+		})
+	}
+});
+
 stubr.run();
