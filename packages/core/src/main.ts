@@ -1,13 +1,11 @@
 const debug = require('debug')('stubr');
 import * as path from 'path';
 import logger from './utils/logger';
-import * as Koa from 'koa';
-import * as koaServe_ from 'koa-static';
-const koaServe = koaServe_;
-import * as bodyParser_ from 'koa-bodyparser';
-const bodyParser = bodyParser_;
-import * as xmlParser_ from 'koa-xml-body';
-const xmlParser = xmlParser_;
+import type Koa from 'koa';
+const KoaServer = require('koa');
+const koaServe = require('koa-static');
+const bodyParser = require('koa-bodyparser');
+const xmlParser = require('koa-xml-body');
 import { Server, Socket } from 'socket.io';
 import { nanoid } from 'nanoid';
 import * as http from 'http';
@@ -36,7 +34,7 @@ import {
 
 class Stubr implements IStubr {
     private stubrConfig: Config = {};
-    private mockServer: Koa = new Koa();
+    private mockServer = new KoaServer();
     private uiServer: http.Server | undefined;
     private io: Server | undefined;
     private scenarios: Scenario[] = [];
@@ -59,7 +57,7 @@ class Stubr implements IStubr {
         debug(`current working dir: "${path.resolve(process.cwd())}"`);
         this.mockServer.use(
             xmlParser({
-                onerror: (err, ctx) => {
+                onerror: (err: any) => {
                     logger.warn(
                         `failed to parse body as xml with status "${
                             (err as any)?.status
@@ -78,7 +76,7 @@ class Stubr implements IStubr {
     }
 
     private initUiServer() {
-        const app = new Koa();
+        const app = new KoaServer();
         const _staticFilesDirectory = path.resolve(__dirname, '../static');
         debug(`serve static files from "${_staticFilesDirectory}"`);
         app.use(koaServe(_staticFilesDirectory));
@@ -203,14 +201,22 @@ class Stubr implements IStubr {
         debug('run() stubr with config: ', this.stubrConfig);
 
         // version
-        this.mockServer.use(async (ctx, next) => {
+        this.mockServer.use(async (ctx: Koa.ParameterizedContext<
+            Koa.DefaultState,
+            Koa.DefaultContext,
+            any
+        >, next: any) => {
             await next();
             ctx.set('X-Stubr-Version', `v${(<any>pjson).version}`);
         });
 
         // x-response-time
 
-        this.mockServer.use(async (ctx, next) => {
+        this.mockServer.use(async (ctx: Koa.ParameterizedContext<
+            Koa.DefaultState,
+            Koa.DefaultContext,
+            any
+        >, next: any) => {
             const start = Date.now();
             await next();
             const ms = Date.now() - start;
@@ -226,7 +232,7 @@ class Stubr implements IStubr {
                     Koa.DefaultContext,
                     any
                 >,
-                next
+                next: any
             ) => {
                 const _params = extractRequestParams(ctx, this.scenarios);
 
