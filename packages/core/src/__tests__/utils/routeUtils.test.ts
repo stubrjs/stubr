@@ -338,8 +338,6 @@ test('determine scenario matches for route and method', () => {
         scenarios
     );
 
-    console.log(scenarioMatches);
-
     expect(scenarioMatches).toHaveLength(1);
     expect(scenarioMatches[0].name).toEqual('Scenario 2');
 });
