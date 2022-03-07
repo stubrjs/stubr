@@ -1,21 +1,32 @@
-# This is a basic workflow to help you get started with Actions
-
 name: New Release
 
-# Controls when the workflow will run
 on:
-
-  # Allows you to run this workflow manually from the Actions tab
-  workflow_dispatch:
-
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+    workflow_dispatch:
+        inputs:
+            version_type:
+                description: 'Semver type of new version (major / minor / patch)'
+                required: true
+                type: choice
+                options:
+                    - patch
+                    - minor
+                    - major
+            release_type:
+                description: 'Choose "preview" for experimental release'
+                required: true
+                type: choice
+                options:
+                    - release
+                    - preview
 jobs:
-  # This workflow contains a single job called "build"
-  build:
-    # The type of runner that the job will run on
-    runs-on: ubuntu-latest
-
-    # Steps represent a sequence of tasks that will be executed as part of the job
-    steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v2
+    bump-version:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Check out source
+              uses: actions/checkout@v2
+            - name: Setup nodeJS
+              uses: actions/setup-node@v2
+              with:
+                  node-version: '14.16.0'
+            - run: yarn install
+            - run: VERSION_TYPE=${{ github.event.inputs.version_type }} RELEASE_TYPE=${{ github.event.inputs.release_type }} node ./scripts/release.mjs
