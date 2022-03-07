@@ -1,6 +1,7 @@
 {
   "name": "example",
   "version": "1.0.0",
+  "private": true,
   "scripts": {
     "dev:debug": "DEBUG=stubr* nodemon --config nodemon.json src/example.ts",
     "dev": "nodemon --config nodemon.json src/example.ts"
