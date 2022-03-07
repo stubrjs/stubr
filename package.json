@@ -3,10 +3,10 @@
   "private": true,
   "workspaces": ["packages/*"],
   "scripts": {
-    "dev:ui": "lerna run dev --scope @stubr/ui --stream",
     "build": "./scripts/build.sh",
-    "build:ui": "lerna run build --scope @stubr/ui --stream",
-    "build:stubr": "lerna run build --scope stubr --stream"
+    "ui:build": "lerna run build --scope @stubr/ui --stream",
+    "stubr:test": "lerna run test --scope stubr --stream",
+    "stubr:build": "lerna run build --scope stubr --stream"
   },
   "devDependencies": {
     "lerna": "^3.22.1"
