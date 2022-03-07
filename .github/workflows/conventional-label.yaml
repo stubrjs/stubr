@@ -1,7 +1,8 @@
+name: conventional release labels
+
 on:
-  pull_request:
-    types: [ opened, edited ]
-name: conventional-release-labels
+  pull_request
+
 jobs:
   label:
     runs-on: ubuntu-latest
