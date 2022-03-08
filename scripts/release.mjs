@@ -57,7 +57,7 @@ async function main() {
             '--conventional-prerelease',
             '--preid',
             'beta',
-            `pre${versionType}`,
+            'prerelease',
             '--yes',
         ]);
     } else if (releaseType === 'release' && versionType === 'graduate') {
