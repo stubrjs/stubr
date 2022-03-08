@@ -9,7 +9,7 @@ import { EventType, ErrorCode } from '../@types/enums';
 import logger from './logger';
 import {
     getScenarioMatchesForRouteAndMethod,
-    extractPathParams
+    extractPathParams,
 } from './routeUtils';
 
 const extractRequestParams = (
@@ -22,7 +22,7 @@ const extractRequestParams = (
     let _requestParams: {
         [key: string]: string | string[];
     } = {
-        ...ctx?.request?.query
+        ...ctx?.request?.query,
     };
 
     const _filteredScenarios: Scenario[] = getScenarioMatchesForRouteAndMethod(
@@ -35,20 +35,20 @@ const extractRequestParams = (
     if (_filteredScenarios?.length > 0) {
         _requestParams = {
             ...extractPathParams(ctx.path, _filteredScenarios[0]),
-            ..._requestParams
+            ..._requestParams,
         };
     }
 
     return _requestParams;
 };
 
-const seedResponseWithCase = (
+const seedResponseWithCase = async (
     ioServer: Server | undefined,
     ctx: Koa.ParameterizedContext<Koa.DefaultState, Koa.DefaultContext, any>,
     scenarios: Scenario[],
     selectedScenario: Scenario,
     logEntryId?: string
-): void => {
+): Promise<void> => {
     if (selectedScenario.group) {
         ctx.set('X-Stubr-Case-Group', selectedScenario.group);
     }
@@ -133,16 +133,25 @@ const seedResponseWithCase = (
             ctx.body = { error: 'file not found' };
         }
     } else if (typeof selectedScenario.responseBody == 'function') {
-        // if responseBody is a function pass request headers and body
-        // to enable dynamic determination of response body
         debug(
             'execute function responseBody() since responseBody was determined to be a function'
         );
-        ctx.body = selectedScenario.responseBody(
-            ctx.request.headers as { [key: string]: string },
-            ctx.request.body,
-            _requestParams
-        );
+        try {
+            ctx.body = await selectedScenario.responseBody(
+                ctx.request.headers as { [key: string]: string },
+                ctx.request.body,
+                _requestParams
+            );
+        } catch (err) {
+            ctx.status = 500;
+            ctx.body = {
+                errorType: 'internal server error',
+                message: `Execution of responseBody function failed. Received error: ${err}`,
+            };
+            logger.error(
+                `responseBody function failed for scenario with name "${selectedScenario.name}". Received error: "${err}"`
+            );
+        }
     } else if (selectedScenario.responseBody) {
         debug('assign responseBody without evaluation');
         ctx.body = selectedScenario.responseBody;
@@ -158,7 +167,7 @@ const seedResponseWithCase = (
         request: {
             headers: ctx.request.headers,
             body: ctx.request.body,
-            params: _requestParams
+            params: _requestParams,
         },
         response: {
             status: ctx.status,
@@ -167,8 +176,8 @@ const seedResponseWithCase = (
                 selectedScenario.responseFilePath !== undefined &&
                 selectedScenario.responseFilePath !== null &&
                 ctx.status < 400,
-            body: ctx.body
-        }
+            body: ctx.body,
+        },
     };
 
     if (
@@ -198,18 +207,18 @@ const composeErrorLogEntry = (
         request: {
             headers: ctx.request.headers,
             body: ctx.request.body,
-            params: extractRequestParams(ctx, scenarios)
+            params: extractRequestParams(ctx, scenarios),
         },
         response: {
             status: ctx.status,
             headers: ctx.response.headers,
             hasSentFile: false,
-            body: ctx.body
+            body: ctx.body,
         },
         error: {
             code: errorCode,
-            message: errorMessage
-        }
+            message: errorMessage,
+        },
     };
 };
 
