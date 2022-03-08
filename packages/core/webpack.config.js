@@ -1,6 +1,6 @@
-const path = require('path')
-const nodeExternals = require('webpack-node-externals')
-const CopyPlugin = require('copy-webpack-plugin')
+const path = require('path');
+const nodeExternals = require('webpack-node-externals');
+const CopyPlugin = require('copy-webpack-plugin');
 
 module.exports = {
     mode: 'production',
@@ -28,22 +28,22 @@ module.exports = {
             }
         ]
     },
-    externals: [nodeExternals()],
+    externals: [nodeExternals(), 'utf-8-validate', 'bufferutil'],
     plugins: [
         new CopyPlugin({
             patterns: [
                 {
                     from: path.resolve(
                         process.cwd(),
-                        'node_modules/@stubr/ui/dist/'
+                        '../../node_modules/@stubr/ui/dist/'
                     ),
                     to: path.resolve(process.cwd(), './static')
                 },
                 {
-                    from: path.resolve(__dirname, '../globals.d.ts'),
+                    from: path.resolve(process.cwd(), './src/globals.d.ts'),
                     to: path.resolve(process.cwd(), './dist')
                 }
             ]
         })
     ]
-}
+};

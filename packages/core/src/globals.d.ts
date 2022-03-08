@@ -10,12 +10,16 @@ declare class Stubr {
         delay?: number;
         validate: (headers: object, body: object, params: object) => boolean;
         responseCode: number;
-	    responseHeaders?: { [key: string]: string } | ((headers: object, body: object, params: object) => object);
-	    responseFilePath?: string;
-	    responseBody?: object | ((headers: object, body: object, params: object) => any);
-    })
+        responseHeaders?:
+            | { [key: string]: string }
+            | ((headers: object, body: object, params: object) => object);
+        responseFilePath?: string;
+        responseBody?:
+            | object
+            | ((headers: object, body: object, params: object) => any);
+    }): void;
 
-    run(): void
+    run(): void;
 }
 
 export default Stubr;
@@ -23,11 +27,11 @@ export default Stubr;
 export as namespace Stubr;
 
 export enum Method {
-	OPTIONS = "OPTIONS",
-	HEAD = "HEAD",
-	GET = "GET",
-	POST = "POST",
-	PUT = "PUT",
-	PATCH = "PATCH",
-	DELETE = "DELETE"
+    OPTIONS = 'OPTIONS',
+    HEAD = 'HEAD',
+    GET = 'GET',
+    POST = 'POST',
+    PUT = 'PUT',
+    PATCH = 'PATCH',
+    DELETE = 'DELETE'
 }

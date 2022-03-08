@@ -1,5 +1,10 @@
 <img src="./docs/logo-large.png"/>
 
+<p align="center">
+  <a href="https://www.npmjs.com/package/stubr"><img src="https://img.shields.io/npm/v/stubr.svg?sanitize=true" alt="Version"></a>
+  <a href="https://www.npmjs.com/package/stubr"><img src="https://img.shields.io/npm/l/stubr.svg?sanitize=true" alt="License"></a>
+</p>
+
 A flexibile mock server to stub third party APIs. Stubr can answer API requests based on configured scenarios. These can be resolved automatically based on validation functions as well as manually via request interceptions. On top it optionally exposes a UI to monitor requests giving insights into request and response headers and bodies, determined scenarios and gives control over manual scenario resolution.
 
 ## Installation
