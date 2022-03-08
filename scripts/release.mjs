@@ -38,13 +38,22 @@ async function main() {
         await run('npx', [
             'lerna',
             'version',
+            '--conventional-commits',
+            '--conventional-prerelease',
             '--preid',
             'beta',
             `pre${versionType}`,
             '--yes',
         ]);
     } else if (releaseType === 'release') {
-        await run('npx', ['lerna', 'version', versionType, '--yes']);
+        await run('npx', [
+            'lerna',
+            'version',
+            '--conventional-commits',
+            '--conventional-graduate',
+            versionType,
+            '--yes',
+        ]);
     } else {
         console.error(`unkown releaseType "${releaseType}"`);
         process.exit(1);
@@ -53,10 +62,10 @@ async function main() {
     step('updating lock files...');
     await run('yarn', ['install']);
 
-    step('generating release notes...');
-    await run('yarn', ['changelog']);
-    await run('git', ['add', '-A']);
-    await run('git', ['commit', '-m', `docs: update of release notes`]);
+    //step('generating release notes...');
+    //await run('yarn', ['changelog']);
+    //await run('git', ['add', '-A']);
+    //await run('git', ['commit', '-m', `docs: update of release notes`]);
 
     step('performing new builds...');
     await run('yarn', ['build']);
