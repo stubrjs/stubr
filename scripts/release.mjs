@@ -51,6 +51,7 @@ async function main() {
             'version',
             '--conventional-commits',
             '--conventional-graduate',
+            '--create-release github',
             versionType,
             '--yes',
         ]);
