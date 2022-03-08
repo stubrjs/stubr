@@ -4,10 +4,11 @@ on:
     workflow_dispatch:
         inputs:
             version_type:
-                description: 'Semver type of new version (major / minor / patch)'
+                description: 'Semver type of new version (major / minor / patch) or prerelease (e.g. beta.0 -> beta.1)'
                 required: true
                 type: choice
                 options:
+                    - prerelease
                     - patch
                     - minor
                     - major
@@ -16,8 +17,9 @@ on:
                 required: true
                 type: choice
                 options:
-                    - release
                     - beta
+                    - release
+
 jobs:
     bump-version:
         runs-on: ubuntu-latest
@@ -33,4 +35,7 @@ jobs:
                   git config user.name "GitHub Actions Bot"
                   git config user.email "<>"
             - run: yarn install
+            - run: echo //registry.npmjs.org/:_authToken=${NPM_TOKEN} > .npmrc
+              env:
+                  NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
             - run: VERSION_TYPE=${{ github.event.inputs.version_type }} RELEASE_TYPE=${{ github.event.inputs.release_type }} node ./scripts/release.mjs

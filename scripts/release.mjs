@@ -34,25 +34,40 @@ async function main() {
     await runIfNotDry('yarn', ['build']);
 
     step('bumping version...');
-    if (releaseType === 'beta') {
+    if (releaseType === 'beta' && releaseType !== 'prerelease') {
         await run('npx', [
             'lerna',
-            'version',
+            'publish',
             '--conventional-commits',
             '--conventional-prerelease',
             '--preid',
             'beta',
             `pre${versionType}`,
+            '--dist-tag',
+            'beta',
+            '--yes',
+        ]);
+    } else if (releaseType === 'beta' && releaseType === 'prerelease') {
+        await run('npx', [
+            'lerna',
+            'publish',
+            '--conventional-commits',
+            '--conventional-prerelease',
+            '--preid',
+            'beta',
+            '--dist-tag',
+            'beta',
             '--yes',
         ]);
     } else if (releaseType === 'release') {
         await run('npx', [
             'lerna',
-            'version',
+            'publish',
             '--conventional-commits',
             '--conventional-graduate',
             '--create-release github',
-            versionType,
+            '--dist-tag',
+            'latest',
             '--yes',
         ]);
     } else {
