@@ -105,6 +105,7 @@ async function main() {
         'from-package',
         '--dist-tag',
         releaseType === 'release' ? 'latest' : 'beta',
+        '--no-verify-access',
         '--yes',
     ]);
 }
