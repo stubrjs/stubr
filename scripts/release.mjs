@@ -28,71 +28,81 @@ const step = (msg) => console.log(chalk.cyan(`\n${msg}`));
 
 async function main() {
     step('performing unit tests...');
-    await runIfNotDry('yarn', ['stubr:test']);
+    await run('yarn', ['stubr:test']);
 
     step('performing builds as sanity check...');
-    await runIfNotDry('yarn', ['build']);
+    await run('yarn', ['build']);
 
     step('bumping version...');
-    if (releaseType === 'beta' && releaseType !== 'prerelease') {
-        await run('npx', [
+    if (
+        releaseType === 'beta' &&
+        versionType !== 'prerelease' &&
+        versionType !== 'graduate'
+    ) {
+        await runIfNotDry('npx', [
             'lerna',
-            'publish',
+            'version',
             '--conventional-commits',
             '--conventional-prerelease',
             '--preid',
             'beta',
             `pre${versionType}`,
-            '--dist-tag',
-            'beta',
             '--yes',
         ]);
-    } else if (releaseType === 'beta' && releaseType === 'prerelease') {
-        await run('npx', [
+    } else if (releaseType === 'beta' && versionType === 'prerelease') {
+        await runIfNotDry('npx', [
             'lerna',
-            'publish',
+            'version',
             '--conventional-commits',
             '--conventional-prerelease',
             '--preid',
             'beta',
-            '--dist-tag',
-            'beta',
+            `pre${versionType}`,
             '--yes',
         ]);
-    } else if (releaseType === 'release') {
-        await run('npx', [
+    } else if (releaseType === 'release' && versionType === 'graduate') {
+        await runIfNotDry('npx', [
             'lerna',
-            'publish',
+            'version',
             '--conventional-commits',
             '--conventional-graduate',
             '--create-release github',
-            '--dist-tag',
-            'latest',
+            '--yes',
+        ]);
+    } else if (
+        releaseType === 'release' &&
+        versionType !== 'graduate' &&
+        versionType !== 'prerelease'
+    ) {
+        await runIfNotDry('npx', [
+            'lerna',
+            'version',
+            '--conventional-commits',
+            '--create-release github',
+            versionType,
             '--yes',
         ]);
     } else {
-        console.error(`unkown releaseType "${releaseType}"`);
+        console.error(
+            `unsupported combination of versionType "${versionType}" and releaseType "${releaseType}"`
+        );
         process.exit(1);
     }
 
     step('updating lock files...');
     await run('yarn', ['install']);
 
-    //step('generating release notes...');
-    //await run('yarn', ['changelog']);
-    //await run('git', ['add', '-A']);
-    //await run('git', ['commit', '-m', `docs: update of release notes`]);
-
     step('performing new builds...');
     await run('yarn', ['build']);
 
     step('pushing to GitHub...');
-    await runIfNotDry('git', ['push']);
+    await run('git', ['push']);
 
     step('publishing packages...');
     await runIfNotDry('npx', [
         'lerna',
         'publish',
+        'from-package',
         '--dist-tag',
         releaseType === 'release' ? 'latest' : 'beta',
         '--yes',

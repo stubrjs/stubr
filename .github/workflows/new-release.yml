@@ -9,6 +9,7 @@ on:
                 type: choice
                 options:
                     - prerelease
+                    - graduate
                     - patch
                     - minor
                     - major
