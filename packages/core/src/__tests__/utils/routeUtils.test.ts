@@ -6,8 +6,8 @@ import {
     isRouteMatch,
     isInterceptedForRouteAndMethod,
     getScenarioMatchesForRouteAndMethod,
-    //setRouteInterceptionMarker,
-    //unsetRouteInterceptionMarkersForSocketId
+    setRouteInterceptionMarker,
+    unsetRouteInterceptionMarkersForSocketId,
 } from '../../utils/routeUtils';
 import { Method } from '../../@types/enums';
 
