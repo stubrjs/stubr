@@ -23,13 +23,13 @@ import {
     isInterceptedForRouteAndMethod,
     getScenarioMatchesForRouteAndMethod,
     setRouteInterceptionMarker,
-    unsetRouteInterceptionMarkersForSocketId
+    unsetRouteInterceptionMarkersForSocketId,
 } from './utils/routeUtils';
 
 import {
     extractRequestParams,
     seedResponseWithCase,
-    composeErrorLogEntry
+    composeErrorLogEntry,
 } from './utils/responseUtils';
 
 class Stubr implements IStubr {
@@ -63,7 +63,7 @@ class Stubr implements IStubr {
                             (err as any)?.status
                         }" and message "${err?.message}"`
                     );
-                }
+                },
             })
         );
         this.mockServer.use(bodyParser());
@@ -85,8 +85,8 @@ class Stubr implements IStubr {
             this.io = new Server(this.uiServer, {
                 cors: {
                     origin: 'http://localhost:8080',
-                    methods: ['GET', 'POST']
-                }
+                    methods: ['GET', 'POST'],
+                },
             });
         }
     }
@@ -157,9 +157,9 @@ class Stubr implements IStubr {
                                 event.scenarioId
                             );
                             debug(
-                                `currently intercepted requests: ${Object.keys(
-                                    this.interceptions
-                                ) || 'none'}`
+                                `currently intercepted requests: ${
+                                    Object.keys(this.interceptions) || 'none'
+                                }`
                             );
                         } else {
                             debug(
@@ -201,27 +201,37 @@ class Stubr implements IStubr {
         debug('run() stubr with config: ', this.stubrConfig);
 
         // version
-        this.mockServer.use(async (ctx: Koa.ParameterizedContext<
-            Koa.DefaultState,
-            Koa.DefaultContext,
-            any
-        >, next: any) => {
-            await next();
-            ctx.set('X-Stubr-Version', `v${(<any>pjson).version}`);
-        });
+        this.mockServer.use(
+            async (
+                ctx: Koa.ParameterizedContext<
+                    Koa.DefaultState,
+                    Koa.DefaultContext,
+                    any
+                >,
+                next: any
+            ) => {
+                await next();
+                ctx.set('X-Stubr-Version', `v${(<any>pjson).version}`);
+            }
+        );
 
         // x-response-time
 
-        this.mockServer.use(async (ctx: Koa.ParameterizedContext<
-            Koa.DefaultState,
-            Koa.DefaultContext,
-            any
-        >, next: any) => {
-            const start = Date.now();
-            await next();
-            const ms = Date.now() - start;
-            ctx.set('X-Response-Time', `${ms}ms`);
-        });
+        this.mockServer.use(
+            async (
+                ctx: Koa.ParameterizedContext<
+                    Koa.DefaultState,
+                    Koa.DefaultContext,
+                    any
+                >,
+                next: any
+            ) => {
+                const start = Date.now();
+                await next();
+                const ms = Date.now() - start;
+                ctx.set('X-Response-Time', `${ms}ms`);
+            }
+        );
 
         // response
 
@@ -236,11 +246,12 @@ class Stubr implements IStubr {
             ) => {
                 const _params = extractRequestParams(ctx, this.scenarios);
 
-                const _filteredScenarios: Scenario[] = getScenarioMatchesForRouteAndMethod(
-                    ctx.path,
-                    <Method>ctx.method,
-                    this.scenarios
-                );
+                const _filteredScenarios: Scenario[] =
+                    getScenarioMatchesForRouteAndMethod(
+                        ctx.path,
+                        <Method>ctx.method,
+                        this.scenarios
+                    );
 
                 if (
                     isInterceptedForRouteAndMethod(
@@ -257,7 +268,7 @@ class Stubr implements IStubr {
                         request: {
                             headers: ctx.request.headers,
                             body: ctx.request.body,
-                            params: _params
+                            params: _params,
                         },
                         scenarios: _filteredScenarios.map(
                             (
@@ -270,10 +281,10 @@ class Stubr implements IStubr {
                                 return {
                                     id: scenario.id,
                                     group: scenario.group,
-                                    name: scenario.name
+                                    name: scenario.name,
                                 };
                             }
-                        )
+                        ),
                     };
 
                     debug(
@@ -283,20 +294,19 @@ class Stubr implements IStubr {
                     this.io?.emit(EventType.LOG_ENTRY, _logEntry);
                     logger.info(JSON.stringify(_logEntry));
 
-                    await new Promise<void>(resolve => {
-                        this.interceptions[_logEntry.id] = (
+                    await new Promise<void>((resolve) => {
+                        this.interceptions[_logEntry.id] = async (
                             scenarioId: string
                         ) => {
-                            const _selectedScenario:
-                                | Scenario
-                                | undefined = _filteredScenarios.find(
-                                (scenario: Scenario): boolean => {
-                                    return scenario.id == scenarioId;
-                                }
-                            );
+                            const _selectedScenario: Scenario | undefined =
+                                _filteredScenarios.find(
+                                    (scenario: Scenario): boolean => {
+                                        return scenario.id == scenarioId;
+                                    }
+                                );
 
                             if (_selectedScenario) {
-                                seedResponseWithCase(
+                                await seedResponseWithCase(
                                     this.io,
                                     ctx,
                                     this.scenarios,
@@ -321,36 +331,35 @@ class Stubr implements IStubr {
                         );
                     });
                 } else {
-                    const _scenarioMatch:
-                        | Scenario
-                        | undefined = _filteredScenarios.find(
-                        (scenario: Scenario): boolean => {
-                            if (typeof scenario.validate == 'function') {
-                                debug(
-                                    `execute function validate() for scenario with name "${scenario.name}"`
-                                );
-                                const _isValid = scenario.validate(
-                                    ctx.request.headers as {
-                                        [key: string]: string;
-                                    },
-                                    ctx.request.body,
-                                    _params
-                                );
-
-                                if (_isValid) {
+                    const _scenarioMatch: Scenario | undefined =
+                        _filteredScenarios.find(
+                            (scenario: Scenario): boolean => {
+                                if (typeof scenario.validate == 'function') {
                                     debug(
-                                        `found match for scenario with name "${scenario.name}"`
+                                        `execute function validate() for scenario with name "${scenario.name}"`
+                                    );
+                                    const _isValid = scenario.validate(
+                                        ctx.request.headers as {
+                                            [key: string]: string;
+                                        },
+                                        ctx.request.body,
+                                        _params
+                                    );
+
+                                    if (_isValid) {
+                                        debug(
+                                            `found match for scenario with name "${scenario.name}"`
+                                        );
+                                    }
+                                    return _isValid;
+                                } else {
+                                    logger.warn(
+                                        `scenario with name "${scenario.name}" cannot be automatically reached since function validate() is not defined`
                                     );
                                 }
-                                return _isValid;
-                            } else {
-                                logger.warn(
-                                    `scenario with name "${scenario.name}" cannot be automatically reached since function validate() is not defined`
-                                );
+                                return false;
                             }
-                            return false;
-                        }
-                    );
+                        );
 
                     // resolve match
                     if (_scenarioMatch) {
@@ -361,7 +370,7 @@ class Stubr implements IStubr {
                             debug(
                                 `waiting for ${_scenarioMatch.delay}ms before resolving request...`
                             );
-                            await new Promise<void>(resolve => {
+                            await new Promise<void>((resolve) => {
                                 setTimeout(() => {
                                     debug(`proceeding with resolving request`);
                                     resolve();
@@ -378,7 +387,7 @@ class Stubr implements IStubr {
                             );
                         }
 
-                        seedResponseWithCase(
+                        await seedResponseWithCase(
                             this.io,
                             ctx,
                             this.scenarios,
