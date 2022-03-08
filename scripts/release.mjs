@@ -56,7 +56,7 @@ async function main() {
     step('generating release notes...');
     await run('yarn', ['changelog']);
     await run('git', ['add', '-A']);
-    await run('git', ['commit', '-m', `release: update of release notes`]);
+    await run('git', ['commit', '-m', `docs: update of release notes`]);
 
     step('performing new builds...');
     await run('yarn', ['build']);
