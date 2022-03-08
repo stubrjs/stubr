@@ -50,13 +50,13 @@ async function main() {
         process.exit(1);
     }
 
+    step('updating lock files...');
+    await run('yarn', ['install']);
+
     step('generating release notes...');
     await run('yarn', ['changelog']);
     await run('git', ['add', '-A']);
     await run('git', ['commit', '-m', `release: update of release notes`]);
-
-    step('updating lock files...');
-    await run('yarn', ['install']);
 
     step('performing new builds...');
     await run('yarn', ['build']);
