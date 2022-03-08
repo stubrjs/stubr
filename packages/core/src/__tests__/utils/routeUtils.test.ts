@@ -6,8 +6,8 @@ import {
     isRouteMatch,
     isInterceptedForRouteAndMethod,
     getScenarioMatchesForRouteAndMethod,
-    setRouteInterceptionMarker,
-    unsetRouteInterceptionMarkersForSocketId
+    //setRouteInterceptionMarker,
+    //unsetRouteInterceptionMarkersForSocketId
 } from '../../utils/routeUtils';
 import { Method } from '../../@types/enums';
 
@@ -17,47 +17,48 @@ test('check route configuration state', () => {
             routeConfigurationId: 'randomId-1',
             intercepted: true,
             method: Method.POST,
-            socketId: 'abcd'
+            socketId: 'abcd',
         },
         {
             routeConfigurationId: 'randomId-2',
             intercepted: true,
             method: Method.GET,
-            socketId: 'abcd'
+            socketId: 'abcd',
         },
         {
             routeConfigurationId: 'randomId-3',
             intercepted: false,
             method: Method.GET,
-            socketId: 'abcd'
-        }
+            socketId: 'abcd',
+        },
     ];
 
     const routeConfigurations: RouteConfiguration[] = [
         {
             id: 'randomId-1',
             methods: [{ method: 'POST', intercepted: false }],
-            route: '/route1'
+            route: '/route1',
         },
         {
             id: 'randomId-2',
             methods: [
                 { method: 'GET', intercepted: false },
-                { method: 'POST', intercepted: false }
+                { method: 'POST', intercepted: false },
             ],
-            route: '/route2'
+            route: '/route2',
         },
         {
             id: 'randomId-3',
             methods: [{ method: 'PUT', intercepted: false }],
-            route: '/route3'
-        }
+            route: '/route3',
+        },
     ];
 
-    const determindedRouteConfigurations: RouteConfiguration[] = determineRouteConfigurationState(
-        routeConfigurations,
-        interceptionMarkers
-    );
+    const determindedRouteConfigurations: RouteConfiguration[] =
+        determineRouteConfigurationState(
+            routeConfigurations,
+            interceptionMarkers
+        );
 
     expect(determindedRouteConfigurations).toMatchObject([
         {
@@ -65,35 +66,35 @@ test('check route configuration state', () => {
             methods: [
                 {
                     intercepted: true,
-                    method: 'POST'
-                }
+                    method: 'POST',
+                },
             ],
-            route: '/route1'
+            route: '/route1',
         },
         {
             id: 'randomId-2',
             methods: [
                 {
                     method: 'GET',
-                    intercepted: true
+                    intercepted: true,
                 },
                 {
                     method: 'POST',
-                    intercepted: false
-                }
+                    intercepted: false,
+                },
             ],
-            route: '/route2'
+            route: '/route2',
         },
         {
             id: 'randomId-3',
             methods: [
                 {
                     intercepted: false,
-                    method: 'PUT'
-                }
+                    method: 'PUT',
+                },
             ],
-            route: '/route3'
-        }
+            route: '/route3',
+        },
     ]);
 });
 
@@ -104,27 +105,26 @@ test('route configurations correctly extracted', () => {
             method: Method.GET,
             route: '/my-test/route-1',
             responseCode: 200,
-            validate: () => true
+            validate: () => true,
         },
         {
             name: 'Scenario 2',
             method: Method.POST,
             route: '/my-test/route-1',
             responseCode: 200,
-            validate: () => true
+            validate: () => true,
         },
         {
             name: 'Scenario 3',
             method: Method.PUT,
             route: '/my-test/route-2',
             responseCode: 200,
-            validate: () => false
-        }
+            validate: () => false,
+        },
     ];
 
-    const extractedRoutes: RouteConfiguration[] = extractRouteConfigurations(
-        scenarios
-    );
+    const extractedRoutes: RouteConfiguration[] =
+        extractRouteConfigurations(scenarios);
 
     expect(extractedRoutes.length).toEqual(2);
 
@@ -133,14 +133,14 @@ test('route configurations correctly extracted', () => {
     expect(extractedRoutes[0].route).toEqual('/my-test/route-1');
     expect(extractedRoutes[0].methods).toMatchObject([
         { method: 'GET', intercepted: false },
-        { method: 'POST', intercepted: false }
+        { method: 'POST', intercepted: false },
     ]);
 
     // item 2
     expect(extractedRoutes[1].id.length).toBeGreaterThan(10);
     expect(extractedRoutes[1].route).toEqual('/my-test/route-2');
     expect(extractedRoutes[1].methods).toMatchObject([
-        { method: 'PUT', intercepted: false }
+        { method: 'PUT', intercepted: false },
     ]);
 });
 
@@ -149,13 +149,13 @@ test('get route configuration by ID - found', () => {
         {
             id: 'randomId-1',
             methods: [{ method: 'POST', intercepted: false }],
-            route: '/route1'
+            route: '/route1',
         },
         {
             id: 'randomId-2',
             methods: [{ method: 'GET', intercepted: false }],
-            route: '/route2'
-        }
+            route: '/route2',
+        },
     ];
 
     const config: RouteConfiguration | undefined = getRouteConfigurationById(
@@ -172,13 +172,13 @@ test('get route configuration by ID - not found', () => {
         {
             id: 'randomId-1',
             methods: [{ method: 'POST', intercepted: false }],
-            route: '/route1'
+            route: '/route1',
         },
         {
             id: 'randomId-2',
             methods: [{ method: 'GET', intercepted: false }],
-            route: '/route2'
-        }
+            route: '/route2',
+        },
     ];
 
     const config: RouteConfiguration | undefined = getRouteConfigurationById(
@@ -195,7 +195,7 @@ test('extract path params from paths', () => {
         method: Method.GET,
         route: '/first-segment/{myFirstParam}/another-segment/{mySecondParam}',
         responseCode: 200,
-        validate: () => true
+        validate: () => true,
     };
 
     const pathParams = extractPathParams(
@@ -205,7 +205,7 @@ test('extract path params from paths', () => {
 
     expect(pathParams).toMatchObject({
         myFirstParam: 'first-value',
-        mySecondParam: 'second-value'
+        mySecondParam: 'second-value',
     });
 });
 
@@ -250,21 +250,21 @@ test('check if route is intercepted - true', () => {
         {
             id: 'randomId-1',
             methods: [{ method: 'POST', intercepted: false }],
-            route: '/route1'
+            route: '/route1',
         },
         {
             id: 'randomId-2',
             methods: [
                 { method: 'GET', intercepted: false },
-                { method: 'POST', intercepted: true }
+                { method: 'POST', intercepted: true },
             ],
-            route: '/route2'
+            route: '/route2',
         },
         {
             id: 'randomId-3',
             methods: [{ method: 'PUT', intercepted: false }],
-            route: '/route3'
-        }
+            route: '/route3',
+        },
     ];
 
     const isIntercepted: boolean = isInterceptedForRouteAndMethod(
@@ -281,21 +281,21 @@ test('check if route is intercepted - false', () => {
         {
             id: 'randomId-1',
             methods: [{ method: 'POST', intercepted: false }],
-            route: '/route1'
+            route: '/route1',
         },
         {
             id: 'randomId-2',
             methods: [
                 { method: 'GET', intercepted: false },
-                { method: 'POST', intercepted: true }
+                { method: 'POST', intercepted: true },
             ],
-            route: '/route2'
+            route: '/route2',
         },
         {
             id: 'randomId-3',
             methods: [{ method: 'PUT', intercepted: false }],
-            route: '/route3'
-        }
+            route: '/route3',
+        },
     ];
 
     const isIntercepted: boolean = isInterceptedForRouteAndMethod(
@@ -314,22 +314,22 @@ test('determine scenario matches for route and method', () => {
             method: Method.GET,
             route: '/my-test/route-1',
             responseCode: 200,
-            validate: () => true
+            validate: () => true,
         },
         {
             name: 'Scenario 2',
             method: Method.POST,
             route: '/my-test/route-1',
             responseCode: 200,
-            validate: () => true
+            validate: () => true,
         },
         {
             name: 'Scenario 3',
             method: Method.PUT,
             route: '/my-test/route-2',
             responseCode: 200,
-            validate: () => false
-        }
+            validate: () => false,
+        },
     ];
 
     const scenarioMatches: Scenario[] = getScenarioMatchesForRouteAndMethod(
