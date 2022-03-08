@@ -12,12 +12,12 @@ on:
                     - minor
                     - major
             release_type:
-                description: 'Choose "preview" for experimental release'
+                description: 'Choose "beta" for experimental release'
                 required: true
                 type: choice
                 options:
                     - release
-                    - preview
+                    - beta
 jobs:
     bump-version:
         runs-on: ubuntu-latest

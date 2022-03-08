@@ -34,7 +34,7 @@ async function main() {
     await runIfNotDry('yarn', ['build']);
 
     step('bumping version...');
-    if (releaseType === 'preview') {
+    if (releaseType === 'beta') {
         await run('npx', [
             'lerna',
             'version',
@@ -52,6 +52,12 @@ async function main() {
 
     step('generating release notes...');
     await run('yarn', ['changelog']);
+    await runIfNotDry('git', ['add', '-A']);
+    await runIfNotDry('git', [
+        'commit',
+        '-m',
+        `release: update of release notes`,
+    ]);
 
     step('updating lock files...');
     await run('yarn', ['install']);
@@ -59,8 +65,17 @@ async function main() {
     step('performing new builds...');
     await run('yarn', ['build']);
 
-    step('\nPushing to GitHub...');
+    step('pushing to GitHub...');
     await runIfNotDry('git', ['push']);
+
+    step('publishing packages...');
+    await runIfNotDry('npx', [
+        'lerna',
+        'publish',
+        '--dist-tag',
+        releaseType === 'release' ? 'latest' : 'beta',
+        '--yes',
+    ]);
 }
 
 main().catch((err) => {
