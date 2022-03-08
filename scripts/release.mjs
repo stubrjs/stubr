@@ -52,12 +52,8 @@ async function main() {
 
     step('generating release notes...');
     await run('yarn', ['changelog']);
-    await runIfNotDry('git', ['add', '-A']);
-    await runIfNotDry('git', [
-        'commit',
-        '-m',
-        `release: update of release notes`,
-    ]);
+    await run('git', ['add', '-A']);
+    await run('git', ['commit', '-m', `release: update of release notes`]);
 
     step('updating lock files...');
     await run('yarn', ['install']);
