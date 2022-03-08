@@ -36,7 +36,5 @@ jobs:
                   git config user.name "GitHub Actions Bot"
                   git config user.email "<>"
             - run: yarn install
-            - run: echo //registry.npmjs.org/:_authToken=${NPM_TOKEN} > .npmrc
-              env:
-                  NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+            - run: echo //registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }} > .npmrc
             - run: VERSION_TYPE=${{ github.event.inputs.version_type }} RELEASE_TYPE=${{ github.event.inputs.release_type }} node ./scripts/release.mjs
