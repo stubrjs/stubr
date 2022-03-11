@@ -13,11 +13,17 @@ declare class Stubr {
         method: Method;
         group?: string;
         delay?: number;
-        validate: (headers: object, body: object, params: object) => boolean;
+        validate?:
+            | boolean
+            | ((headers: object, body: object, params: object) => boolean);
         responseCode: number;
         responseHeaders?:
             | { [key: string]: string }
-            | ((headers: object, body: object, params: object) => object);
+            | ((
+                  headers: object,
+                  body: object,
+                  params: object
+              ) => { [key: string]: string });
         responseFilePath?: string;
         responseBody?:
             | object
