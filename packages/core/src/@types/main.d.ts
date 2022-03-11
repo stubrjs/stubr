@@ -29,7 +29,8 @@ interface IStubr {
 interface Config {
     stubsPort?: number;
     uiPort?: number;
-    relativePath?: string;
+    corsEnabled?: boolean;
+    corsAllowedOrigin?: string;
 }
 
 interface Scenario {
