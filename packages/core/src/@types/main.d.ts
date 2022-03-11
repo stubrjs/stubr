@@ -30,7 +30,7 @@ interface Config {
     stubsPort?: number;
     uiPort?: number;
     corsEnabled?: boolean;
-    corsAllowedOrigin?: string;
+    corsAllowOrigin?: string;
 }
 
 interface Scenario {
