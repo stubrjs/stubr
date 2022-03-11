@@ -19,7 +19,11 @@ declare class Stubr {
         responseCode: number;
         responseHeaders?:
             | { [key: string]: string }
-            | ((headers: object, body: object, params: object) => object);
+            | ((
+                  headers: object,
+                  body: object,
+                  params: object
+              ) => { [key: string]: string });
         responseFilePath?: string;
         responseBody?:
             | object
