@@ -1,23 +1,7 @@
 {
-	"compilerOptions": {
-		"module": "commonjs",
-		"moduleResolution": "node",
-		"target": "es5",
-		"noImplicitAny": false,
-		"sourceMap": true,
-		"experimentalDecorators": true,
-		"resolveJsonModule": true,
-		"strict": true
-	},
-	"typeRoots": [
-		"./core/src/lib/@types",
-		"./core/src/ui/@types"
-	],
-	"include": [
-		"./core/src"
-	],
-	"exclude": [
-		"node_modules",
-		"./core/node_modules"
-	]
+    "references": [
+        { "path": "./packages/core" },
+        { "path": "./packages/stubr-ui" }
+    ],
+    "files": []
 }

@@ -1,0 +1,31 @@
+// colors
+$c-primary: #174dff;
+$c-secondary: #f23558;
+
+$c-blue: $c-primary;
+$c-green: #09e88b;
+$c-red: $c-secondary;
+$c-purple: #a109e8;
+$c-yellow: #ffdf01;
+$c-orange: #ff680a;
+
+$c-background: #fcfeff;
+$c-reduced-presence-level-1: #afafaf;
+$c-reduced-presence-level-2: #f7f8f9;
+$c-tile-separator: $c-primary;
+$c-highlight: $c-blue;
+$c-error: $c-red;
+$c-success: $c-green;
+$c-interception: $c-orange;
+$c-route-post: $c-blue;
+$c-route-get: $c-green;
+$c-route-delete: $c-red;
+$c-route-put: $c-purple;
+$c-route-patch: $c-yellow;
+
+// layout
+$l-max-content-width: 1024px;
+$l-header-height: 40px;
+
+$l-tag-box-shadow: 0 1px 13px 0 rgba(100, 100, 100, 0.2);
+$l-tag-box-shadow-hover: 0 1px 7px 0 rgba(100, 100, 100, 0.3);
