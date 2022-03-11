@@ -339,26 +339,41 @@ class Stubr implements IStubr {
                                     debug(
                                         `execute function validate() for scenario with name "${scenario.name}"`
                                     );
-                                    const _isValid = scenario.validate(
-                                        ctx.request.headers as {
-                                            [key: string]: string;
-                                        },
-                                        ctx.request.body,
-                                        _params
-                                    );
 
-                                    if (_isValid) {
+                                    try {
+                                        const _isValid = scenario.validate(
+                                            ctx.request.headers as {
+                                                [key: string]: string;
+                                            },
+                                            ctx.request.body,
+                                            _params
+                                        );
+
+                                        if (_isValid) {
+                                            debug(
+                                                `found match for scenario with name "${scenario.name}"`
+                                            );
+                                        }
+
+                                        return _isValid;
+                                    } catch (err) {
+                                        logger.error(
+                                            `executing function validate() failed for scenario with name "${scenario.name}". Received error: "${err}"`
+                                        );
+                                        return false;
+                                    }
+                                } else if (
+                                    typeof scenario.validate == 'boolean'
+                                ) {
+                                    if (scenario.validate) {
                                         debug(
                                             `found match for scenario with name "${scenario.name}"`
                                         );
                                     }
-                                    return _isValid;
-                                } else {
-                                    logger.warn(
-                                        `scenario with name "${scenario.name}" cannot be automatically reached since function validate() is not defined`
-                                    );
+
+                                    return scenario.validate;
                                 }
-                                return false;
+                                return true;
                             }
                         );
 

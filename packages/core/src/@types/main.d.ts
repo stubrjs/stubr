@@ -12,7 +12,9 @@ interface IStubr {
         method: Method;
         group?: string;
         delay?: number;
-        validate: (headers: object, body: object, params: object) => boolean;
+        validate?:
+            | boolean
+            | ((headers: object, body: object, params: object) => boolean);
         responseCode: number;
         responseHeaders?:
             | { [key: string]: string }
@@ -40,11 +42,9 @@ interface Scenario {
     method: Method;
     group?: string;
     delay?: number;
-    validate: (
-        headers: { [key: string]: string },
-        body: any,
-        params: { [key: string]: string | string[] }
-    ) => boolean;
+    validate?:
+        | boolean
+        | ((headers: object, body: object, params: object) => boolean);
     responseCode: number;
     responseHeaders?:
         | { [key: string]: string }
