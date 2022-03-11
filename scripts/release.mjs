@@ -66,7 +66,6 @@ async function main() {
             'version',
             '--conventional-commits',
             '--conventional-graduate',
-            '--create-release github',
             '--yes',
         ]);
     } else if (
@@ -78,7 +77,6 @@ async function main() {
             'lerna',
             'version',
             '--conventional-commits',
-            '--create-release github',
             versionType,
             '--yes',
         ]);
