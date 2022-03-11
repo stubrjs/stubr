@@ -311,7 +311,8 @@ class Stubr implements IStubr {
                                     ctx,
                                     this.scenarios,
                                     _selectedScenario,
-                                    _logEntry.id
+                                    _logEntry.id,
+                                    this.stubrConfig
                                 );
                                 resolve();
                                 debug(
@@ -391,11 +392,30 @@ class Stubr implements IStubr {
                             this.io,
                             ctx,
                             this.scenarios,
-                            _scenarioMatch
+                            _scenarioMatch,
+                            undefined,
+                            this.stubrConfig
                         );
                     }
 
-                    if (_filteredScenarios.length == 0) {
+                    if (
+                        this.stubrConfig?.corsEnabled &&
+                        <Method>ctx.method === Method.OPTIONS
+                    ) {
+                        ctx.set(
+                            'Access-Control-Allow-Origin',
+                            this.stubrConfig?.corsAllowOrigin
+                                ? this.stubrConfig?.corsAllowOrigin
+                                : '*'
+                        );
+                        ctx.set('Access-Control-Allow-Methods', '*');
+                        ctx.set('Access-Control-Allow-Headers', '*');
+                        ctx.status = 200;
+
+                        debug(
+                            `answered with OPTIONS request for ${ctx.method} ${ctx.path}`
+                        );
+                    } else if (_filteredScenarios.length == 0) {
                         const _errorMessage = 'route not defined';
                         ctx.body = { error: _errorMessage };
                         ctx.status = 404;
@@ -413,11 +433,10 @@ class Stubr implements IStubr {
                         );
                         this.io?.emit(EventType.LOG_ENTRY, _logEntry);
                         logger.warn(JSON.stringify(_logEntry));
-
-                        return;
-                    }
-
-                    if (!_scenarioMatch && _filteredScenarios.length > 0) {
+                    } else if (
+                        !_scenarioMatch &&
+                        _filteredScenarios.length > 0
+                    ) {
                         const _errorMessage = 'no matching scenario found';
                         ctx.body = { error: _errorMessage };
                         ctx.status = 404;

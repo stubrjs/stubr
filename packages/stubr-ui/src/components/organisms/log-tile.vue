@@ -1,7 +1,7 @@
 <template>
     <div class="log-tile">
         <div class="head">
-            <div class="head-left" style="display: flex; align-items: center;">
+            <div class="head-left" style="display: flex; align-items: center">
                 <div :class="['route-type', routeClass]">
                     {{ logEntry.method }}
                 </div>
@@ -73,8 +73,8 @@ import { LogEntryLocal } from '../../@types/events';
 export default Vue.extend({
     props: {
         logEntry: {
-            type: Object as () => LogEntryLocal
-        }
+            type: Object as () => LogEntryLocal,
+        },
     },
     computed: {
         routeClass(): string {
@@ -128,7 +128,7 @@ export default Vue.extend({
         },
         caseMatch(): boolean {
             return !this.logEntry.error && !this.intercepted;
-        }
+        },
     },
     methods: {
         ...mapActions(['resolveRouteInterception']),
@@ -139,16 +139,16 @@ export default Vue.extend({
         }) {
             this.resolveRouteInterception({
                 logEntryId: this.logEntry.id,
-                scenarioId: scenario.id
+                scenarioId: scenario.id,
             });
-        }
+        },
     },
     components: {
         vTag: Tag,
         vIcon: Icon,
         vFormattedPayload: FormattedPayload,
-        vScenarioSelector: ScenarioSelector
-    }
+        vScenarioSelector: ScenarioSelector,
+    },
 });
 </script>
 
@@ -172,6 +172,7 @@ export default Vue.extend({
             font-size: 13px;
             font-weight: 600;
             width: 60px;
+            color: #333;
 
             &.post {
                 color: $c-route-post;

@@ -5,7 +5,7 @@
             color,
             type,
             active ? 'active' : '',
-            clickable ? 'clickable' : ''
+            clickable ? 'clickable' : '',
         ]"
         @click="$emit('click')"
     >
@@ -19,18 +19,18 @@ import Vue from 'vue';
 export default Vue.extend({
     props: {
         color: {
-            type: String
+            type: String,
         },
         type: {
-            type: String
+            type: String,
         },
         clickable: {
-            type: Boolean
+            type: Boolean,
         },
         active: {
-            type: Boolean
-        }
-    }
+            type: Boolean,
+        },
+    },
 });
 </script>
 
@@ -42,11 +42,26 @@ export default Vue.extend({
     border-radius: 6px;
     padding: 6px 15px;
     font-size: 12px;
-    background: #f5f5f5;
+    color: #333;
+    background: #fff;
     font-weight: 500;
     pointer-events: none;
     transition: all 0.2s;
     letter-spacing: 0.5px;
+
+    &:hover {
+        box-shadow: $l-tag-box-shadow-hover;
+    }
+
+    &.active {
+        color: #fff;
+        background: #444;
+        box-shadow: 0 1px 7px 0 rgba(50, 50, 50, 0.5);
+
+        &:hover {
+            background: lighten(#444, 7%);
+        }
+    }
 
     &.clickable {
         box-shadow: $l-tag-box-shadow;
@@ -57,10 +72,6 @@ export default Vue.extend({
     &.green {
         color: $c-green;
         background: #fff;
-
-        &:hover {
-            box-shadow: $l-tag-box-shadow-hover;
-        }
 
         &.active {
             color: #fff;
@@ -77,10 +88,6 @@ export default Vue.extend({
         color: $c-blue;
         background: #fff;
 
-        &:hover {
-            box-shadow: $l-tag-box-shadow-hover;
-        }
-
         &.active {
             color: #fff;
             background: $c-blue;
@@ -95,10 +102,6 @@ export default Vue.extend({
     &.red {
         color: $c-red;
         background: #fff;
-
-        &:hover {
-            box-shadow: $l-tag-box-shadow-hover;
-        }
 
         &.active {
             color: #fff;
@@ -115,10 +118,6 @@ export default Vue.extend({
         color: $c-orange;
         background: #fff;
 
-        &:hover {
-            box-shadow: $l-tag-box-shadow-hover;
-        }
-
         &.active {
             color: #fff;
             background: $c-orange;
@@ -134,10 +133,6 @@ export default Vue.extend({
         color: $c-purple;
         background: #fff;
 
-        &:hover {
-            box-shadow: $l-tag-box-shadow-hover;
-        }
-
         &.active {
             color: #fff;
             background: $c-purple;
@@ -152,10 +147,6 @@ export default Vue.extend({
     &.yellow {
         color: $c-yellow;
         background: #fff;
-
-        &:hover {
-            box-shadow: $l-tag-box-shadow-hover;
-        }
 
         &.active {
             color: #fff;

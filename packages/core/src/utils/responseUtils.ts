@@ -47,13 +47,23 @@ const seedResponseWithCase = async (
     ctx: Koa.ParameterizedContext<Koa.DefaultState, Koa.DefaultContext, any>,
     scenarios: Scenario[],
     selectedScenario: Scenario,
-    logEntryId?: string
+    logEntryId?: string,
+    config?: Config
 ): Promise<void> => {
     if (selectedScenario.group) {
         ctx.set('X-Stubr-Case-Group', selectedScenario.group);
     }
     if (selectedScenario.name) {
         ctx.set('X-Stubr-Case-Name', selectedScenario.name);
+    }
+
+    // populate cors headers
+    if (config?.corsEnabled) {
+        debug('cors enabled, setting cors header...');
+        ctx.set(
+            'Access-Control-Allow-Origin',
+            config?.corsAllowOrigin ? config?.corsAllowOrigin : '*'
+        );
     }
 
     ctx.status = selectedScenario.responseCode;

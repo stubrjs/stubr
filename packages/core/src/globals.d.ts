@@ -1,5 +1,10 @@
 declare class Stubr {
-    constructor(config?: object);
+    constructor(config?: {
+        stubsPort?: number;
+        uiPort?: number;
+        corsEnabled?: boolean;
+        corsAllowOrigin?: string;
+    });
 
     register(scenario: {
         id?: string;
@@ -33,5 +38,5 @@ export enum Method {
     POST = 'POST',
     PUT = 'PUT',
     PATCH = 'PATCH',
-    DELETE = 'DELETE'
+    DELETE = 'DELETE',
 }
