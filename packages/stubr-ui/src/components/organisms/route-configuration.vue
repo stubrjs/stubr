@@ -14,6 +14,13 @@
                 >{{ entry.method }}</v-tag
             >
         </div>
+        <div v-if="noOfLogEntries > 0" class="badge">
+            <v-badge
+                @change="handleFilterBadgeChange($event)"
+                :active="filterActive"
+                >{{ this.noOfLogEntries }}</v-badge
+            >
+        </div>
     </div>
 </template>
 
@@ -21,16 +28,17 @@
 import { find } from 'lodash';
 import uuid from 'uuid/v1';
 import Vue from 'vue';
-import { mapActions } from 'vuex';
+import { mapActions, mapGetters } from 'vuex';
 import Tag from '../atoms/tag.vue';
+import Badge from '../atoms/badge.vue';
 import { Method } from '../../@types/enums';
 import { RouteConfiguration, MethodContext } from '../../@types/events';
 
 export default Vue.extend({
     props: {
         routeConfiguration: {
-            type: Object as () => RouteConfiguration
-        }
+            type: Object as () => RouteConfiguration,
+        },
     },
     computed: {
         intercepted(): boolean {
@@ -42,11 +50,23 @@ export default Vue.extend({
                     }
                 ) != undefined || false
             );
-        }
+        },
+        ...mapGetters(['logEntriesPerRoute', 'enabledRouteFilters']),
+        noOfLogEntries(): number {
+            return this.logEntriesPerRoute[this.routeConfiguration?.route]
+                ? this.logEntriesPerRoute[this.routeConfiguration?.route]
+                : 0;
+        },
+        filterActive(): boolean {
+            return this.enabledRouteFilters?.[this.routeConfiguration?.route]
+                ? this.enabledRouteFilters?.[this.routeConfiguration?.route]
+                : false;
+        },
     },
     methods: {
         ...mapActions({
-            toggleRouteInterception: 'toggleRouteInterception'
+            toggleRouteInterception: 'toggleRouteInterception',
+            filterForRouteChanged: 'filterForRouteChanged',
         }),
         getUuid(): string {
             return uuid();
@@ -71,13 +91,20 @@ export default Vue.extend({
             this.toggleRouteInterception({
                 routeConfigurationId: this.routeConfiguration.id,
                 method: method,
-                intercepted: intercepted
+                intercepted: intercepted,
             });
-        }
+        },
+        handleFilterBadgeChange(status: boolean) {
+            this.filterForRouteChanged({
+                route: this.routeConfiguration?.route,
+                status,
+            });
+        },
     },
     components: {
-        vTag: Tag
-    }
+        vTag: Tag,
+        vBadge: Badge,
+    },
 });
 </script>
 
@@ -118,6 +145,10 @@ export default Vue.extend({
         .tag {
             margin: 0 4px;
         }
+    }
+
+    .badge {
+        margin-left: 10px;
     }
 }
 </style>

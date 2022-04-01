@@ -42,30 +42,30 @@ import { isEmpty } from 'lodash';
 export default Vue.extend({
     props: {
         title: {
-            type: String
+            type: String,
         },
         headers: {
-            type: Object
+            type: Object,
         },
         params: {
-            type: Object
+            type: Object,
         },
         hasSentFile: {
-            type: Boolean
+            type: Boolean,
         },
         body: {
-            type: Object
+            type: [Array, Object, String, Number],
         },
         statusCode: {
-            type: Number
+            type: Number,
         },
         iconColor: {
-            type: String
-        }
+            type: String,
+        },
     },
     data() {
         return {
-            revealed: false
+            revealed: false,
         };
     },
     computed: {
@@ -85,19 +85,19 @@ export default Vue.extend({
         },
         hasParams(): boolean {
             return this.params && !isEmpty(this.params);
-        }
+        },
     },
     methods: {
         handleRevealClick(): void {
             this.revealed = !this.revealed;
-        }
+        },
     },
     mounted() {
         new Clipboard('.copy-btn');
     },
     components: {
-        vIcon: Icon
-    }
+        vIcon: Icon,
+    },
 });
 </script>
 

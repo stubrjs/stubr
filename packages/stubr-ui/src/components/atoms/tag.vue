@@ -48,6 +48,7 @@ export default Vue.extend({
     pointer-events: none;
     transition: all 0.2s;
     letter-spacing: 0.5px;
+    user-select: none;
 
     &:hover {
         box-shadow: $l-tag-box-shadow-hover;

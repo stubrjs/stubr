@@ -14,7 +14,7 @@
             <button
                 v-if="
                     routeConfigurations &&
-                        routeConfigurations.length > minimizedItemsMax
+                    routeConfigurations.length > minimizedItemsMax
                 "
                 class="toggle-trigger"
                 @click="isListExpanded = !isListExpanded"
@@ -34,7 +34,7 @@ export default Vue.extend({
     data() {
         return {
             isListExpanded: false,
-            minimizedItemsMax: 3
+            minimizedItemsMax: 3,
         };
     },
     computed: {
@@ -56,19 +56,24 @@ export default Vue.extend({
                     (this as any).minimizedItemsMax
                 );
 
-                // push intercepted routes
-                const _interceptedRoutes = (this as any).routeConfigurations
+                // push intercepted or filtered routes
+                const _interceptedOrFilteredRoutes = (
+                    this as any
+                ).routeConfigurations
                     .slice(
                         (this as any).minimizedItemsMax,
                         (this as any).routeConfigurations.length
                     )
-                    .filter(config => {
-                        return config.methods.find(method => {
+                    .filter((config) => {
+                        return config.methods.find((method) => {
                             return method.intercepted === true;
                         });
                     });
 
-                _configurations = [..._configurations, ..._interceptedRoutes];
+                _configurations = [
+                    ..._configurations,
+                    ..._interceptedOrFilteredRoutes,
+                ];
 
                 // reduce by not intercepted if _configurations.length > minimizedItemsMax
                 const _overhang =
@@ -76,8 +81,8 @@ export default Vue.extend({
                 if (_overhang > 0) {
                     _configurations.reverse();
                     for (let i = _overhang; i > 0; i--) {
-                        const _index = _configurations.findIndex(config => {
-                            return !config.methods.find(method => {
+                        const _index = _configurations.findIndex((config) => {
+                            return !config.methods.find((method) => {
                                 return method.intercepted === true;
                             });
                         });
@@ -91,11 +96,11 @@ export default Vue.extend({
 
                 return _configurations;
             }
-        }
+        },
     },
     components: {
-        vRouteConfiguration: RouteConfiguration
-    }
+        vRouteConfiguration: RouteConfiguration,
+    },
 });
 </script>
 

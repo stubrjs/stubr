@@ -6,9 +6,11 @@ import {
     RouteConfiguration,
     LogEntryRemote,
     LogEntryLocal,
+    LogEntriesPerRoute,
     RouteInterception,
+    EnabledRouteFilters,
     ResolveInterception,
-    MethodContext
+    MethodContext,
 } from '../@types/events';
 import { EventType } from '../@types/enums';
 
@@ -19,13 +21,15 @@ interface RootState {
     connected: boolean;
     routeConfigurations: RouteConfiguration[];
     logEntries: LogEntryLocal[];
+    enabledRouteFilters: EnabledRouteFilters;
 }
 
 const state: RootState = {
     socket: Socket,
     connected: false,
     routeConfigurations: [],
-    logEntries: []
+    logEntries: [],
+    enabledRouteFilters: {},
 };
 
 const mutations: MutationTree<RootState> = {
@@ -50,7 +54,7 @@ const mutations: MutationTree<RootState> = {
         } else {
             state.routeConfigurations = [
                 ...state.routeConfigurations,
-                routeConfiguration
+                routeConfiguration,
             ];
         }
     },
@@ -69,13 +73,27 @@ const mutations: MutationTree<RootState> = {
             const _logEntriesClone: LogEntryLocal[] = clone(state.logEntries);
             _logEntriesClone[_foundLogEntryIndex] = {
                 ...logEntryLocal,
-                timestamp: state.logEntries[_foundLogEntryIndex].timestamp
+                timestamp: state.logEntries[_foundLogEntryIndex].timestamp,
             };
             state.logEntries = _logEntriesClone;
         } else {
             state.logEntries = [...state.logEntries, logEntryLocal];
         }
-    }
+    },
+    SET_FILTER_FOR_ROUTE(
+        state,
+        { route, status }: { route: string; status: boolean }
+    ) {
+        const enabledRouteFilters = { ...state.enabledRouteFilters };
+
+        if (status) {
+            enabledRouteFilters[route] = status;
+        } else {
+            delete enabledRouteFilters[route];
+        }
+
+        state.enabledRouteFilters = enabledRouteFilters;
+    },
 };
 
 const actions: ActionTree<RootState, RootState> = {
@@ -119,7 +137,7 @@ const actions: ActionTree<RootState, RootState> = {
     setLogEntry({ commit }, logEntryRemote: LogEntryRemote) {
         const _logEntryLocal: LogEntryLocal = {
             ...logEntryRemote,
-            timestamp: new Date()
+            timestamp: new Date(),
         };
 
         commit('SET_LOG_ENTRY', _logEntryLocal);
@@ -156,7 +174,13 @@ const actions: ActionTree<RootState, RootState> = {
                 'resolveRouteInterception() could not be executed since no socket being defined'
             );
         }
-    }
+    },
+    filterForRouteChanged(
+        { commit },
+        { route, status }: { route: string; status: boolean }
+    ) {
+        commit('SET_FILTER_FOR_ROUTE', { route, status });
+    },
 };
 
 const getters: GetterTree<RootState, RootState> = {
@@ -168,6 +192,19 @@ const getters: GetterTree<RootState, RootState> = {
     },
     logEntries(state): LogEntryLocal[] {
         return orderBy(state.logEntries, ['timestamp'], 'desc');
+    },
+    logEntriesPerRoute(state, getters): LogEntriesPerRoute {
+        const logEntriesPerRoute: LogEntriesPerRoute = {};
+
+        getters?.logEntries.forEach((logEntry: LogEntryLocal) => {
+            if (!logEntriesPerRoute[logEntry.route]) {
+                logEntriesPerRoute[logEntry.route] = 1;
+            } else {
+                logEntriesPerRoute[logEntry.route]++;
+            }
+        });
+
+        return logEntriesPerRoute;
     },
     numberOfInterceptionMarkers(state): number {
         let _counter = 0;
@@ -181,14 +218,17 @@ const getters: GetterTree<RootState, RootState> = {
             }
         );
         return _counter;
-    }
+    },
+    enabledRouteFilters(state): EnabledRouteFilters {
+        return state.enabledRouteFilters;
+    },
 };
 
 const store = new Vuex.Store<RootState>({
     state,
     mutations,
     actions,
-    getters
+    getters,
 });
 
 export default store;

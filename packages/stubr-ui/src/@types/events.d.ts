@@ -1,54 +1,62 @@
-import { Method, ErrorCode } from "./enums";
+import { Method, ErrorCode } from './enums';
 
 interface MethodContext {
-	method: string;
-	intercepted: boolean;
+    method: string;
+    intercepted: boolean;
 }
 
 interface RouteConfiguration {
-	id: string;
-	route: string;
-	methods: Array<MethodContext>;
+    id: string;
+    route: string;
+    methods: Array<MethodContext>;
 }
 
 interface LogEntryRemote {
-	id: string;
-	group?: string;
-	name?: string;
-	route: string;
-	method: Method;
-	intercepted: boolean;
-	delay?: number;
-	request: {
-		headers: { [key: string]: string };
-		body: object;
-		params: object;
-	}
-	response?: {
-		status: number;
-		headers: { [key: string]: string };
-		hasSentFile: boolean;
-		body: object;
-	}
-	scenarios?: Array<{
-		id: string | undefined;
-		group: string | undefined;
-		name: string;
-	}>;
-	error?: { code: ErrorCode, message: string };
+    id: string;
+    group?: string;
+    name?: string;
+    route: string;
+    method: Method;
+    intercepted: boolean;
+    delay?: number;
+    request: {
+        headers: { [key: string]: string };
+        body: object;
+        params: object;
+    };
+    response?: {
+        status: number;
+        headers: { [key: string]: string };
+        hasSentFile: boolean;
+        body: object;
+    };
+    scenarios?: Array<{
+        id: string | undefined;
+        group: string | undefined;
+        name: string;
+    }>;
+    error?: { code: ErrorCode; message: string };
 }
 
 interface LogEntryLocal extends LogEntryRemote {
-	timestamp: Date;
+    timestamp: Date;
+}
+
+interface LogEntriesPerRoute {
+    [route: string]: number;
 }
 
 interface RouteInterception {
-	routeConfigurationId: string;
-	method: Method;
-	intercept: boolean;
+    routeConfigurationId: string;
+    method: Method;
+    intercept: boolean;
 }
 
 interface ResolveInterception {
-	logEntryId: string,
-	scenarioId: string
+    logEntryId: string;
+    scenarioId: string;
+}
+
+interface EnabledRouteFilters {
+    [route: string]: boolean;
 }
