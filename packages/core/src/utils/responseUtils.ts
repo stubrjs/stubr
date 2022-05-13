@@ -108,7 +108,6 @@ const seedResponseWithCase = async (
     ) {
         // send file if responseFilePath has been
         const _filePath: string = path.resolve(
-            process.cwd(),
             selectedScenario.responseFilePath
         );
         debug(`send file from path: "${_filePath}"`);
