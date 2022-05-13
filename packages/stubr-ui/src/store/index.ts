@@ -7,6 +7,8 @@ import {
     LogEntryRemote,
     LogEntryLocal,
     LogEntriesPerRoute,
+    HiddenLogEntriesMarker,
+    HiddenLogEntriesMarkerMap,
     RouteInterception,
     EnabledRouteFilters,
     ResolveInterception,
@@ -206,6 +208,63 @@ const getters: GetterTree<RootState, RootState> = {
 
         return logEntriesPerRoute;
     },
+    filteredLogEntries(state, getters): LogEntryLocal[] {
+        return getters.logEntries?.filter((logEntry: LogEntryLocal) => {
+            if (getters.anyRouteFilterEnabled) {
+                return getters.enabledRouteFilters[logEntry.route];
+            }
+
+            return true;
+        });
+    },
+    hiddenLogEntriesMap(state, getters): HiddenLogEntriesMarkerMap {
+        const hiddenLogEntriesMarkerArray: HiddenLogEntriesMarker[] = [];
+
+        if (getters.anyRouteFilterEnabled) {
+            getters.logEntries?.forEach(
+                (logEntry: LogEntryLocal, index: number) => {
+                    if (!getters.enabledRouteFilters[logEntry.route]) {
+                        if (
+                            index > 0 &&
+                            !getters.enabledRouteFilters[
+                                getters.logEntries[index - 1]?.route
+                            ]
+                        ) {
+                            hiddenLogEntriesMarkerArray[
+                                hiddenLogEntriesMarkerArray.length - 1
+                            ].noOfHiddenItems++;
+                        } else {
+                            hiddenLogEntriesMarkerArray.push({
+                                startIndex: index,
+                                afterLogEntryId:
+                                    getters.logEntries[index - 1]?.id,
+                                noOfHiddenItems: 1,
+                            });
+                        }
+                    }
+                }
+            );
+        }
+
+        return hiddenLogEntriesMarkerArray.reduce(function (
+            map: HiddenLogEntriesMarkerMap,
+            obj: HiddenLogEntriesMarker
+        ) {
+            map[obj.afterLogEntryId ? obj.afterLogEntryId : 'BEFORE_FIRST'] =
+                obj;
+            return map;
+        },
+        {});
+    },
+    enabledRouteFilters(state): EnabledRouteFilters {
+        return state.enabledRouteFilters;
+    },
+    numberOfEnabledRouteFilters(state): number {
+        return Object.keys(state.enabledRouteFilters)?.length || 0;
+    },
+    anyRouteFilterEnabled(state): boolean {
+        return Object.keys(state.enabledRouteFilters).length > 0;
+    },
     numberOfInterceptionMarkers(state): number {
         let _counter = 0;
         state.routeConfigurations.forEach(
@@ -218,9 +277,6 @@ const getters: GetterTree<RootState, RootState> = {
             }
         );
         return _counter;
-    },
-    enabledRouteFilters(state): EnabledRouteFilters {
-        return state.enabledRouteFilters;
     },
 };
 

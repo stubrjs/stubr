@@ -46,6 +46,16 @@ interface LogEntriesPerRoute {
     [route: string]: number;
 }
 
+interface HiddenLogEntriesMarker {
+    startIndex: number;
+    afterLogEntryId: string;
+    noOfHiddenItems: number;
+}
+
+interface HiddenLogEntriesMarkerMap {
+    [afterLogEntryId: number]: HiddenLogEntriesMarker;
+}
+
 interface RouteInterception {
     routeConfigurationId: string;
     method: Method;

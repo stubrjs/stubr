@@ -16,6 +16,18 @@
                 >
                     {{ numberOfInterceptionMarkers }} routes intercepted
                 </span>
+                <span
+                    v-if="numberOfEnabledRouteFilters == 1"
+                    class="filter-counter"
+                >
+                    {{ numberOfEnabledRouteFilters }} filter active
+                </span>
+                <span
+                    v-if="numberOfEnabledRouteFilters > 1"
+                    class="filter-counter"
+                >
+                    {{ numberOfEnabledRouteFilters }} filters active
+                </span>
             </span>
             <v-route-configurations slot="body"></v-route-configurations>
         </v-section>
@@ -37,12 +49,15 @@ import Section from './components/molecules/section.vue';
 
 export default Vue.extend({
     computed: {
-        ...mapGetters(['numberOfInterceptionMarkers'])
+        ...mapGetters([
+            'numberOfInterceptionMarkers',
+            'numberOfEnabledRouteFilters',
+        ]),
     },
     methods: {
         ...mapActions({
-            initStore: 'init'
-        })
+            initStore: 'init',
+        }),
     },
     mounted() {
         this.initStore();
@@ -51,8 +66,8 @@ export default Vue.extend({
         vHeader: Header,
         vRouteConfigurations: RouteConfigurations,
         vLogTiles: LogTiles,
-        vSection: Section
-    }
+        vSection: Section,
+    },
 });
 </script>
 
@@ -75,6 +90,12 @@ export default Vue.extend({
     .interception-counter {
         padding-left: 20px;
         color: $c-interception;
+        font-size: 12px;
+    }
+
+    .filter-counter {
+        padding-left: 20px;
+        color: $c-filter;
         font-size: 12px;
     }
 }

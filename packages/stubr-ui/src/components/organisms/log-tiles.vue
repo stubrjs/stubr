@@ -1,11 +1,28 @@
 <template>
     <div class="log-tiles">
-        <v-log-tile
-            v-for="logEntry in logEntries"
-            :key="logEntry.id"
-            :log-entry="logEntry"
-        ></v-log-tile>
-        <div v-if="!logEntries || logEntries.length == 0" class="placeholder">
+        <v-hidden-entries-separator
+            class="first-separator"
+            v-if="hiddenLogEntriesMap['BEFORE_FIRST']"
+            key="BEFORE_FIRST-sep"
+            :noOfHiddenEntries="
+                hiddenLogEntriesMap['BEFORE_FIRST'].noOfHiddenItems
+            "
+        ></v-hidden-entries-separator>
+        <template v-for="logEntry in filteredLogEntries">
+            <v-log-tile :key="logEntry.id" :log-entry="logEntry"></v-log-tile>
+            <v-hidden-entries-separator
+                v-if="hiddenLogEntriesMap[logEntry.id]"
+                :key="logEntry.id + '-sep'"
+                :noOfHiddenEntries="
+                    hiddenLogEntriesMap[logEntry.id].noOfHiddenItems
+                "
+            ></v-hidden-entries-separator>
+        </template>
+
+        <div
+            v-if="!filteredLogEntries || filteredLogEntries.length == 0"
+            class="placeholder"
+        >
             waiting for the first event ...
         </div>
     </div>
@@ -16,14 +33,16 @@ import Vue from 'vue';
 import { mapGetters } from 'vuex';
 
 import LogTile from './log-tile.vue';
+import HiddenEntriesSeparator from '../molecules/hidden-entries-separator.vue';
 
 export default Vue.extend({
     computed: {
-        ...mapGetters(['logEntries'])
+        ...mapGetters(['filteredLogEntries', 'hiddenLogEntriesMap']),
     },
     components: {
-        vLogTile: LogTile
-    }
+        vLogTile: LogTile,
+        vHiddenEntriesSeparator: HiddenEntriesSeparator,
+    },
 });
 </script>
 
@@ -48,6 +67,15 @@ export default Vue.extend({
         padding: 80px 0;
         text-align: center;
         color: #b4bdd9;
+    }
+
+    .separator-line {
+        margin-top: 30px;
+        margin-bottom: 30px;
+
+        &.first-separator {
+            margin-top: 10px;
+        }
     }
 }
 </style>

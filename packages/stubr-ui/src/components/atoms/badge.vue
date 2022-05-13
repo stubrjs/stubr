@@ -1,5 +1,5 @@
 <template>
-    <div :class="{ badge: true, active: this.active }" @click="onClick()">
+    <div :class="{ badge: true, active: active }" @click="onClick()">
         <slot></slot>
     </div>
 </template>

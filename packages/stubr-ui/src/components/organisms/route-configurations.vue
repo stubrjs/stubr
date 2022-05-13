@@ -38,7 +38,7 @@ export default Vue.extend({
         };
     },
     computed: {
-        ...mapGetters(['routeConfigurations']),
+        ...mapGetters(['routeConfigurations', 'enabledRouteFilters']),
         expandListLabel() {
             return (this as any).isListExpanded
                 ? 'Show Less Routes'
@@ -65,9 +65,14 @@ export default Vue.extend({
                         (this as any).routeConfigurations.length
                     )
                     .filter((config) => {
-                        return config.methods.find((method) => {
+                        const intercepted = config.methods.find((method) => {
                             return method.intercepted === true;
                         });
+
+                        const filtered =
+                            this.enabledRouteFilters?.[config.route];
+
+                        return intercepted || filtered;
                     });
 
                 _configurations = [
@@ -75,16 +80,23 @@ export default Vue.extend({
                     ..._interceptedOrFilteredRoutes,
                 ];
 
-                // reduce by not intercepted if _configurations.length > minimizedItemsMax
+                // reduce by not intercepted nor filtered if _configurations.length > minimizedItemsMax
                 const _overhang =
                     _configurations.length - (this as any).minimizedItemsMax;
                 if (_overhang > 0) {
                     _configurations.reverse();
                     for (let i = _overhang; i > 0; i--) {
                         const _index = _configurations.findIndex((config) => {
-                            return !config.methods.find((method) => {
-                                return method.intercepted === true;
-                            });
+                            const intercepted = config.methods.find(
+                                (method) => {
+                                    return method.intercepted === true;
+                                }
+                            );
+
+                            const filtered =
+                                this.enabledRouteFilters?.[config.route];
+
+                            return !intercepted && !filtered;
                         });
 
                         if (_index >= 0) {

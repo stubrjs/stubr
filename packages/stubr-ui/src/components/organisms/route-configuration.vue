@@ -1,5 +1,11 @@
 <template>
-    <div :class="{ 'route-configuration': true, intercepted: intercepted }">
+    <div
+        :class="{
+            'route-configuration': true,
+            intercepted: intercepted,
+            filtered: filterActive,
+        }"
+    >
         <div class="route">{{ routeConfiguration.route }}</div>
         <div class="tags">
             <v-tag
@@ -18,7 +24,7 @@
             <v-badge
                 @change="handleFilterBadgeChange($event)"
                 :active="filterActive"
-                >{{ this.noOfLogEntries }}</v-badge
+                >{{ noOfLogEntries }}</v-badge
             >
         </div>
     </div>
@@ -119,7 +125,7 @@ export default Vue.extend({
     border-left: 3px solid transparent;
 
     &.intercepted {
-        &:after {
+        &:before {
             position: absolute;
             top: 50%;
             margin-top: -3px;
@@ -130,6 +136,33 @@ export default Vue.extend({
             height: 6px;
             border-radius: 50%;
             content: '';
+        }
+
+        &.filtered {
+            &:after {
+                left: -16px;
+            }
+        }
+    }
+
+    &.filtered {
+        &:after {
+            position: absolute;
+            top: 50%;
+            margin-top: -3px;
+            left: -20px;
+            background: $c-filter;
+            box-shadow: 0 1px 7px 0 rgba(23, 77, 255, 0.5);
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            content: '';
+        }
+
+        &.intercepted {
+            &:before {
+                left: -24px;
+            }
         }
     }
 
