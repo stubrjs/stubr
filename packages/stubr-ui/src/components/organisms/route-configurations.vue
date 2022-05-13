@@ -146,7 +146,7 @@ export default Vue.extend({
     }
 
     .list-expander {
-        //background: #F00;
+        margin-top: 30px;
         text-align: center;
 
         .toggle-trigger {
