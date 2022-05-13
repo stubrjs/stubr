@@ -1,0 +1,16 @@
+{
+    "compilerOptions": {
+        "module": "amd",
+        "moduleResolution": "node",
+        "target": "es5",
+        "noImplicitAny": true,
+        "sourceMap": false,
+        "experimentalDecorators": true,
+        "resolveJsonModule": true,
+        "esModuleInterop": true,
+        "strict": true
+    },
+    "typeRoots": ["./src/@types"],
+    "include": ["./src", "webpack.config.js"],
+    "exclude": ["node_modules"]
+}
