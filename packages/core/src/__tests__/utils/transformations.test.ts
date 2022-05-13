@@ -7,7 +7,7 @@ test('scenario enhanced if no id provided', () => {
         name: 'Test',
         route: '/test',
         validate: () => true,
-        responseCode: 200
+        responseCode: 200,
     };
 
     const _outputScenario: Scenario = enhanceScenario(_inputScenario);
@@ -23,28 +23,11 @@ test('scenario id not altered if already provided', () => {
         name: 'Test',
         route: '/test',
         validate: () => true,
-        responseCode: 200
+        responseCode: 200,
     };
 
     const _outputScenario: Scenario = enhanceScenario(_inputScenario);
 
     expect(_inputScenario.id).toEqual('myId');
     expect(_outputScenario.id).toEqual('myId');
-});
-
-test('response file path properly altered if provided', () => {
-    const _inputScenario: Scenario = {
-        responseFilePath: './responseFile.json',
-        method: Method.POST,
-        name: 'Test',
-        route: '/test',
-        validate: () => true,
-        responseCode: 200
-    };
-
-    const _outputScenario: Scenario = enhanceScenario(_inputScenario);
-
-    expect(_outputScenario.responseFilePath).toContain(
-        '/packages/core/src/__tests__/utils/responseFile.json'
-    );
 });
