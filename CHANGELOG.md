@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# 0.6.0-beta.2 (2022-05-16)
+
+**Note:** Version bump only for package stubr
+
 # 0.6.0-beta.1 (2022-05-13)
 
 ### Bug Fixes
