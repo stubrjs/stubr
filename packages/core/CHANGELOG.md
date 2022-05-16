@@ -13,6 +13,12 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 **Note:** Version bump only for package stubr
 
+## 0.5.1 (2022-05-03)
+
+### Bug Fixes
+
+-   failing file path reference ([#80](https://github.com/stubrjs/stubr/issues/80)) ([0e81a4a](https://github.com/stubrjs/stubr/commit/0e81a4ab870ce9e8236a14ef65f1b779365d66cb))
+
 # 0.5.0 (2022-03-11)
 
 **Note:** Version bump only for package stubr
