@@ -33,6 +33,7 @@ interface Config {
     uiPort?: number;
     corsEnabled?: boolean;
     corsAllowOrigin?: string;
+    accessControlExposeHeaders?: string[];
 }
 
 interface Scenario {
