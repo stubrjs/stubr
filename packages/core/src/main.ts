@@ -425,6 +425,12 @@ class Stubr implements IStubr {
                         );
                         ctx.set('Access-Control-Allow-Methods', '*');
                         ctx.set('Access-Control-Allow-Headers', '*');
+                        ctx.set(
+                            'Access-Control-Expose-Headers',
+                            this.stubrConfig?.accessControlExposeHeaders?.length
+                                ? this.stubrConfig?.accessControlExposeHeaders.toString()
+                                : ''
+                        );
                         ctx.status = 200;
 
                         debug(

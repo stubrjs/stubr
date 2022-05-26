@@ -2,5 +2,6 @@
     "stubsPort": 4000,
     "uiPort": 3000,
     "corsEnabled": true,
-    "corsAllowedOrigin": "*"
+    "corsAllowedOrigin": "*",
+    "accessControlExposeHeaders": []
 }

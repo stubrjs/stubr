@@ -4,6 +4,7 @@ declare class Stubr {
         uiPort?: number;
         corsEnabled?: boolean;
         corsAllowOrigin?: string;
+        accessControlExposeHeaders?: string[];
     });
 
     register(scenario: {

@@ -64,6 +64,12 @@ const seedResponseWithCase = async (
             'Access-Control-Allow-Origin',
             config?.corsAllowOrigin ? config?.corsAllowOrigin : '*'
         );
+        ctx.set(
+            'Access-Control-Expose-Headers',
+            config?.accessControlExposeHeaders?.length
+                ? config?.accessControlExposeHeaders.toString()
+                : ''
+        );
     }
 
     ctx.status = selectedScenario.responseCode;
