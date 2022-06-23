@@ -33,6 +33,10 @@ interface Config {
     uiPort?: number;
     corsEnabled?: boolean;
     corsAllowOrigin?: string;
+    swaggerSpecs?: {
+        specPaths: string[];
+        strictMode?: boolean;
+    };
 }
 
 interface Scenario {

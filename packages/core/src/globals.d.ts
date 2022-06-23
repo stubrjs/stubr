@@ -4,6 +4,10 @@ declare class Stubr {
         uiPort?: number;
         corsEnabled?: boolean;
         corsAllowOrigin?: string;
+        swaggerSpecs?: {
+            specPaths: string[];
+            strictMode?: boolean;
+        };
     });
 
     register(scenario: {

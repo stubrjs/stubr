@@ -1,6 +1,8 @@
 const debug = require('debug')('stubr');
 import * as path from 'path';
 import logger from './utils/logger';
+import signale from 'signale';
+import ora from 'ora';
 import type Koa from 'koa';
 const KoaServer = require('koa');
 const koaServe = require('koa-static');
@@ -15,6 +17,7 @@ import * as pjson from '../package.json';
 import { Method, ErrorCode, EventType } from './@types/enums';
 
 import loadConfiguration from './utils/configuration';
+import { parseSwaggerSpecs } from './api-spec-parser';
 import { enhanceScenario } from './utils/transformations';
 import {
     determineRouteConfigurationState,
@@ -71,7 +74,9 @@ class Stubr implements IStubr {
 
     private startMockServer() {
         this.mockServer.listen(this.stubrConfig.stubsPort, () => {
-            logger.info(`started stubr on port: ${this.stubrConfig.stubsPort}`);
+            signale.info(
+                `started Stubr on port: ${this.stubrConfig.stubsPort}`
+            );
         });
     }
 
@@ -93,7 +98,9 @@ class Stubr implements IStubr {
 
     private startUiServer() {
         this.uiServer?.listen(this.stubrConfig.uiPort, () => {
-            logger.info(`started stubr UI on port: ${this.stubrConfig.uiPort}`);
+            signale.info(
+                `started Stubr UI on port: ${this.stubrConfig.uiPort}`
+            );
 
             this.bindSocketIoListeners();
         });
@@ -197,286 +204,348 @@ class Stubr implements IStubr {
         this.scenarios.push(enhanceScenario(scenario));
     }
 
-    public run(): void {
-        debug('run() stubr with config: ', this.stubrConfig);
+    public async run(): Promise<boolean> {
+        return new Promise(async (resolve, reject) => {
+            debug('run() stubr with config: ', this.stubrConfig);
 
-        // version
-        this.mockServer.use(
-            async (
-                ctx: Koa.ParameterizedContext<
-                    Koa.DefaultState,
-                    Koa.DefaultContext,
-                    any
-                >,
-                next: any
-            ) => {
-                await next();
-                ctx.set('X-Stubr-Version', `v${(<any>pjson).version}`);
-            }
-        );
+            let specParserResult: SpecParserResult;
 
-        // x-response-time
+            try {
+                if (this.stubrConfig.swaggerSpecs) {
+                    const spinner = ora('parsing specs').start();
 
-        this.mockServer.use(
-            async (
-                ctx: Koa.ParameterizedContext<
-                    Koa.DefaultState,
-                    Koa.DefaultContext,
-                    any
-                >,
-                next: any
-            ) => {
-                const start = Date.now();
-                await next();
-                const ms = Date.now() - start;
-                ctx.set('X-Response-Time', `${ms}ms`);
-            }
-        );
-
-        // response
-
-        this.mockServer.use(
-            async (
-                ctx: Koa.ParameterizedContext<
-                    Koa.DefaultState,
-                    Koa.DefaultContext,
-                    any
-                >,
-                next: any
-            ) => {
-                const _params = extractRequestParams(ctx, this.scenarios);
-
-                const _filteredScenarios: Scenario[] =
-                    getScenarioMatchesForRouteAndMethod(
-                        ctx.path,
-                        <Method>ctx.method,
-                        this.scenarios
+                    specParserResult = await parseSwaggerSpecs(
+                        this.stubrConfig.swaggerSpecs.specPaths
                     );
 
-                if (
-                    isInterceptedForRouteAndMethod(
-                        ctx.path,
-                        <Method>ctx.method,
-                        this.getRouteConfigurationState()
-                    )
-                ) {
-                    const _logEntry: LogEntry = {
-                        id: nanoid(),
-                        route: ctx.path,
-                        method: <Method>ctx.method,
-                        intercepted: true,
-                        request: {
-                            headers: ctx.request.headers,
-                            body: ctx.request.body,
-                            params: _params,
-                        },
-                        scenarios: _filteredScenarios.map(
-                            (
-                                scenario: Scenario
-                            ): {
-                                id: string | undefined;
-                                group: string | undefined;
-                                name: string;
-                            } => {
-                                return {
-                                    id: scenario.id,
-                                    group: scenario.group,
-                                    name: scenario.name,
+                    spinner.stop();
+
+                    if (specParserResult.errors?.length > 0) {
+                        specParserResult.errors.forEach((error) => {
+                            signale.error(error);
+                        });
+                        throw new Error('parsing specs failed');
+                    }
+
+                    if (specParserResult.scenarios?.length > 0) {
+                        signale.success(
+                            `${specParserResult.scenarios?.length} scenarios parsed from specs`
+                        );
+                    }
+                }
+
+                // output no. of registered route configurations
+                signale.success(
+                    `${this.scenarios?.length} scenarios registered`
+                );
+
+                // version
+                this.mockServer.use(
+                    async (
+                        ctx: Koa.ParameterizedContext<
+                            Koa.DefaultState,
+                            Koa.DefaultContext,
+                            any
+                        >,
+                        next: any
+                    ) => {
+                        await next();
+                        ctx.set('X-Stubr-Version', `v${(<any>pjson).version}`);
+                    }
+                );
+
+                // x-response-time
+
+                this.mockServer.use(
+                    async (
+                        ctx: Koa.ParameterizedContext<
+                            Koa.DefaultState,
+                            Koa.DefaultContext,
+                            any
+                        >,
+                        next: any
+                    ) => {
+                        const start = Date.now();
+                        await next();
+                        const ms = Date.now() - start;
+                        ctx.set('X-Response-Time', `${ms}ms`);
+                    }
+                );
+
+                // response
+
+                this.mockServer.use(
+                    async (
+                        ctx: Koa.ParameterizedContext<
+                            Koa.DefaultState,
+                            Koa.DefaultContext,
+                            any
+                        >,
+                        next: any
+                    ) => {
+                        const _params = extractRequestParams(
+                            ctx,
+                            this.scenarios
+                        );
+
+                        const _filteredScenarios: Scenario[] =
+                            getScenarioMatchesForRouteAndMethod(
+                                ctx.path,
+                                <Method>ctx.method,
+                                this.scenarios
+                            );
+
+                        if (
+                            isInterceptedForRouteAndMethod(
+                                ctx.path,
+                                <Method>ctx.method,
+                                this.getRouteConfigurationState()
+                            )
+                        ) {
+                            const _logEntry: LogEntry = {
+                                id: nanoid(),
+                                route: ctx.path,
+                                method: <Method>ctx.method,
+                                intercepted: true,
+                                request: {
+                                    headers: ctx.request.headers,
+                                    body: ctx.request.body,
+                                    params: _params,
+                                },
+                                scenarios: _filteredScenarios.map(
+                                    (
+                                        scenario: Scenario
+                                    ): {
+                                        id: string | undefined;
+                                        group: string | undefined;
+                                        name: string;
+                                    } => {
+                                        return {
+                                            id: scenario.id,
+                                            group: scenario.group,
+                                            name: scenario.name,
+                                        };
+                                    }
+                                ),
+                            };
+
+                            debug(
+                                `[io] emit event "${EventType.LOG_ENTRY}" with payload:`,
+                                _logEntry
+                            );
+                            this.io?.emit(EventType.LOG_ENTRY, _logEntry);
+                            logger.info(JSON.stringify(_logEntry));
+
+                            await new Promise<void>((resolve) => {
+                                this.interceptions[_logEntry.id] = async (
+                                    scenarioId: string
+                                ) => {
+                                    const _selectedScenario:
+                                        | Scenario
+                                        | undefined = _filteredScenarios.find(
+                                        (scenario: Scenario): boolean => {
+                                            return scenario.id == scenarioId;
+                                        }
+                                    );
+
+                                    if (_selectedScenario) {
+                                        await seedResponseWithCase(
+                                            this.io,
+                                            ctx,
+                                            this.scenarios,
+                                            _selectedScenario,
+                                            _logEntry.id,
+                                            this.stubrConfig
+                                        );
+                                        resolve();
+                                        debug(
+                                            `resolved interception for request with id "${_logEntry.id}" with scenario with id "${scenarioId}"`
+                                        );
+                                        delete this.interceptions[_logEntry.id];
+                                    } else {
+                                        logger.error(
+                                            `could find scenario with id "${scenarioId}" for request with id "${_logEntry.id}" und thus not resolve the request`
+                                        );
+                                    }
                                 };
-                            }
-                        ),
-                    };
-
-                    debug(
-                        `[io] emit event "${EventType.LOG_ENTRY}" with payload:`,
-                        _logEntry
-                    );
-                    this.io?.emit(EventType.LOG_ENTRY, _logEntry);
-                    logger.info(JSON.stringify(_logEntry));
-
-                    await new Promise<void>((resolve) => {
-                        this.interceptions[_logEntry.id] = async (
-                            scenarioId: string
-                        ) => {
-                            const _selectedScenario: Scenario | undefined =
+                                debug(
+                                    `currently intercepted requests: ${Object.keys(
+                                        this.interceptions
+                                    )}`
+                                );
+                            });
+                        } else {
+                            const _scenarioMatch: Scenario | undefined =
                                 _filteredScenarios.find(
                                     (scenario: Scenario): boolean => {
-                                        return scenario.id == scenarioId;
+                                        if (
+                                            typeof scenario.validate ==
+                                            'function'
+                                        ) {
+                                            debug(
+                                                `execute function validate() for scenario with name "${scenario.name}"`
+                                            );
+
+                                            try {
+                                                const _isValid =
+                                                    scenario.validate(
+                                                        ctx.request.headers as {
+                                                            [
+                                                                key: string
+                                                            ]: string;
+                                                        },
+                                                        ctx.request.body,
+                                                        _params
+                                                    );
+
+                                                if (_isValid) {
+                                                    debug(
+                                                        `found match for scenario with name "${scenario.name}"`
+                                                    );
+                                                }
+
+                                                return _isValid;
+                                            } catch (err) {
+                                                logger.error(
+                                                    `executing function validate() failed for scenario with name "${scenario.name}". Received error: "${err}"`
+                                                );
+                                                return false;
+                                            }
+                                        } else if (
+                                            typeof scenario.validate ==
+                                            'boolean'
+                                        ) {
+                                            if (scenario.validate) {
+                                                debug(
+                                                    `found match for scenario with name "${scenario.name}"`
+                                                );
+                                            }
+
+                                            return scenario.validate;
+                                        }
+                                        return true;
                                     }
                                 );
 
-                            if (_selectedScenario) {
+                            // resolve match
+                            if (_scenarioMatch) {
+                                if (
+                                    _scenarioMatch.delay &&
+                                    typeof _scenarioMatch.delay == 'number'
+                                ) {
+                                    debug(
+                                        `waiting for ${_scenarioMatch.delay}ms before resolving request...`
+                                    );
+                                    await new Promise<void>((resolve) => {
+                                        setTimeout(() => {
+                                            debug(
+                                                `proceeding with resolving request`
+                                            );
+                                            resolve();
+                                        }, _scenarioMatch.delay);
+                                    });
+                                }
+
+                                if (
+                                    _scenarioMatch.delay &&
+                                    typeof _scenarioMatch.delay != 'number'
+                                ) {
+                                    logger.warn(
+                                        'property delay is only allowed to receive values of type "number"'
+                                    );
+                                }
+
                                 await seedResponseWithCase(
                                     this.io,
                                     ctx,
                                     this.scenarios,
-                                    _selectedScenario,
-                                    _logEntry.id,
+                                    _scenarioMatch,
+                                    undefined,
                                     this.stubrConfig
                                 );
-                                resolve();
-                                debug(
-                                    `resolved interception for request with id "${_logEntry.id}" with scenario with id "${scenarioId}"`
-                                );
-                                delete this.interceptions[_logEntry.id];
-                            } else {
-                                logger.error(
-                                    `could find scenario with id "${scenarioId}" for request with id "${_logEntry.id}" und thus not resolve the request`
-                                );
                             }
-                        };
-                        debug(
-                            `currently intercepted requests: ${Object.keys(
-                                this.interceptions
-                            )}`
-                        );
-                    });
-                } else {
-                    const _scenarioMatch: Scenario | undefined =
-                        _filteredScenarios.find(
-                            (scenario: Scenario): boolean => {
-                                if (typeof scenario.validate == 'function') {
-                                    debug(
-                                        `execute function validate() for scenario with name "${scenario.name}"`
+
+                            if (
+                                this.stubrConfig?.corsEnabled &&
+                                <Method>ctx.method === Method.OPTIONS
+                            ) {
+                                ctx.set(
+                                    'Access-Control-Allow-Origin',
+                                    this.stubrConfig?.corsAllowOrigin
+                                        ? this.stubrConfig?.corsAllowOrigin
+                                        : '*'
+                                );
+                                ctx.set('Access-Control-Allow-Methods', '*');
+                                ctx.set('Access-Control-Allow-Headers', '*');
+                                ctx.status = 200;
+
+                                debug(
+                                    `answered with OPTIONS request for ${ctx.method} ${ctx.path}`
+                                );
+                            } else if (_filteredScenarios.length == 0) {
+                                const _errorMessage = 'route not defined';
+                                ctx.body = { error: _errorMessage };
+                                ctx.status = 404;
+
+                                const _logEntry: LogEntry =
+                                    composeErrorLogEntry(
+                                        ctx,
+                                        this.scenarios,
+                                        ErrorCode.NO_ROUTE_MATCH,
+                                        _errorMessage
                                     );
 
-                                    try {
-                                        const _isValid = scenario.validate(
-                                            ctx.request.headers as {
-                                                [key: string]: string;
-                                            },
-                                            ctx.request.body,
-                                            _params
-                                        );
+                                debug(
+                                    `[io] emit event "${EventType.LOG_ENTRY}" with payload:`,
+                                    _logEntry
+                                );
+                                this.io?.emit(EventType.LOG_ENTRY, _logEntry);
+                                logger.warn(JSON.stringify(_logEntry));
+                            } else if (
+                                !_scenarioMatch &&
+                                _filteredScenarios.length > 0
+                            ) {
+                                const _errorMessage =
+                                    'no matching scenario found';
+                                ctx.body = { error: _errorMessage };
+                                ctx.status = 404;
 
-                                        if (_isValid) {
-                                            debug(
-                                                `found match for scenario with name "${scenario.name}"`
-                                            );
-                                        }
+                                const _logEntry: LogEntry =
+                                    composeErrorLogEntry(
+                                        ctx,
+                                        this.scenarios,
+                                        ErrorCode.NO_SCENARIO_MATCH,
+                                        _errorMessage
+                                    );
 
-                                        return _isValid;
-                                    } catch (err) {
-                                        logger.error(
-                                            `executing function validate() failed for scenario with name "${scenario.name}". Received error: "${err}"`
-                                        );
-                                        return false;
-                                    }
-                                } else if (
-                                    typeof scenario.validate == 'boolean'
-                                ) {
-                                    if (scenario.validate) {
-                                        debug(
-                                            `found match for scenario with name "${scenario.name}"`
-                                        );
-                                    }
-
-                                    return scenario.validate;
-                                }
-                                return true;
+                                debug(
+                                    `[io] emit event "${EventType.LOG_ENTRY}" with payload:`,
+                                    _logEntry
+                                );
+                                this.io?.emit(EventType.LOG_ENTRY, _logEntry);
+                                logger.warn(JSON.stringify(_logEntry));
                             }
-                        );
-
-                    // resolve match
-                    if (_scenarioMatch) {
-                        if (
-                            _scenarioMatch.delay &&
-                            typeof _scenarioMatch.delay == 'number'
-                        ) {
-                            debug(
-                                `waiting for ${_scenarioMatch.delay}ms before resolving request...`
-                            );
-                            await new Promise<void>((resolve) => {
-                                setTimeout(() => {
-                                    debug(`proceeding with resolving request`);
-                                    resolve();
-                                }, _scenarioMatch.delay);
-                            });
                         }
-
-                        if (
-                            _scenarioMatch.delay &&
-                            typeof _scenarioMatch.delay != 'number'
-                        ) {
-                            logger.warn(
-                                'property delay is only allowed to receive values of type "number"'
-                            );
-                        }
-
-                        await seedResponseWithCase(
-                            this.io,
-                            ctx,
-                            this.scenarios,
-                            _scenarioMatch,
-                            undefined,
-                            this.stubrConfig
-                        );
                     }
+                );
 
-                    if (
-                        this.stubrConfig?.corsEnabled &&
-                        <Method>ctx.method === Method.OPTIONS
-                    ) {
-                        ctx.set(
-                            'Access-Control-Allow-Origin',
-                            this.stubrConfig?.corsAllowOrigin
-                                ? this.stubrConfig?.corsAllowOrigin
-                                : '*'
-                        );
-                        ctx.set('Access-Control-Allow-Methods', '*');
-                        ctx.set('Access-Control-Allow-Headers', '*');
-                        ctx.status = 200;
+                this.routeConfigurations = extractRouteConfigurations(
+                    this.scenarios
+                );
 
-                        debug(
-                            `answered with OPTIONS request for ${ctx.method} ${ctx.path}`
-                        );
-                    } else if (_filteredScenarios.length == 0) {
-                        const _errorMessage = 'route not defined';
-                        ctx.body = { error: _errorMessage };
-                        ctx.status = 404;
+                this.startMockServer();
+                this.startUiServer();
 
-                        const _logEntry: LogEntry = composeErrorLogEntry(
-                            ctx,
-                            this.scenarios,
-                            ErrorCode.NO_ROUTE_MATCH,
-                            _errorMessage
-                        );
-
-                        debug(
-                            `[io] emit event "${EventType.LOG_ENTRY}" with payload:`,
-                            _logEntry
-                        );
-                        this.io?.emit(EventType.LOG_ENTRY, _logEntry);
-                        logger.warn(JSON.stringify(_logEntry));
-                    } else if (
-                        !_scenarioMatch &&
-                        _filteredScenarios.length > 0
-                    ) {
-                        const _errorMessage = 'no matching scenario found';
-                        ctx.body = { error: _errorMessage };
-                        ctx.status = 404;
-
-                        const _logEntry: LogEntry = composeErrorLogEntry(
-                            ctx,
-                            this.scenarios,
-                            ErrorCode.NO_SCENARIO_MATCH,
-                            _errorMessage
-                        );
-
-                        debug(
-                            `[io] emit event "${EventType.LOG_ENTRY}" with payload:`,
-                            _logEntry
-                        );
-                        this.io?.emit(EventType.LOG_ENTRY, _logEntry);
-                        logger.warn(JSON.stringify(_logEntry));
-                    }
-                }
+                resolve(true);
+            } catch (err) {
+                signale.fatal(
+                    'starting Stubr failed. Please check error logs for further details.'
+                );
+                setTimeout(() => {
+                    process.exit(1);
+                }, 1000);
             }
-        );
-
-        this.routeConfigurations = extractRouteConfigurations(this.scenarios);
-        this.startMockServer();
-        this.startUiServer();
+        });
     }
 }
 

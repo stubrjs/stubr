@@ -1,7 +1,11 @@
 import Stubr from 'stubr';
 import { Method } from 'stubr';
 
-const stubr = new Stubr();
+const stubr = new Stubr({
+    swaggerSpecs: {
+        specPaths: ['./src/specs/example.yaml'],
+    },
+});
 
 stubr.register({
     group: 'MyGroup',

@@ -22,6 +22,9 @@
         "mock server ui"
     ],
     "license": "MIT",
+    "engines": {
+        "node": ">=14"
+    },
     "devDependencies": {
         "@babel/core": "^7.17.0",
         "@babel/preset-typescript": "^7.16.7",
@@ -33,6 +36,7 @@
         "@types/koa-xml-body": "^2.0.2",
         "@types/lodash": "^4.14.168",
         "@types/node": "^12.19.15",
+        "@types/signale": "^1.4.4",
         "@types/webpack": "^4.41.26",
         "@types/webpack-env": "^1.16.0",
         "@types/winston": "^2.4.4",
@@ -58,9 +62,13 @@
         "koa-static": "^5.0.0",
         "koa-xml-body": "^2.2.0",
         "lodash": "^4.17.20",
+        "openapi-types": "^12.0.0",
+        "ora": "^5.4.1",
         "sass": "^1.32.6",
+        "signale": "^1.4.0",
         "socket.io": "^4.4.1",
         "stack-trace": "^0.0.10",
+        "swagger-parser": "^10.0.3",
         "winston": "^3.3.3",
         "winston-daily-rotate-file": "^4.5.0"
     }
