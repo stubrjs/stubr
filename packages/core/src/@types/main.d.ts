@@ -46,6 +46,7 @@ interface Scenario {
     method: Method;
     group?: string;
     delay?: number;
+    validationRules?: ValidateRules;
     validate?:
         | boolean
         | ((headers: object, body: object, params: object) => boolean);
@@ -65,6 +66,42 @@ interface Scenario {
               body: any,
               params: { [key: string]: string | string[] }
           ) => any);
+}
+
+type AttributeType =
+    | 'boolean'
+    | 'object'
+    | 'number'
+    | 'string'
+    | 'integer'
+    | 'array';
+
+type RuleGroup = {
+    groupType: 'OR' | 'AND';
+    items: (RuleObject | RuleGroup)[];
+};
+
+type RuleObject = {
+    attributeName: string;
+    attributeType: AttributeType;
+} & (
+    | {
+          type: 'GT' | 'GTEQ' | 'LT' | 'LTEQ';
+          value: any;
+      }
+    | {
+          type: 'ENUM';
+          enum?: Array<any>;
+      }
+    | {
+          mandatory: boolean;
+      }
+);
+
+interface ValidateRules {
+    headers?: RuleGroup | RuleObject[];
+    params?: RuleGroup | RuleObject[];
+    body?: RuleGroup | RuleObject[];
 }
 
 interface LogEntry {

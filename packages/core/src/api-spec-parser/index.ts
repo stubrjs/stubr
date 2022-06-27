@@ -2,7 +2,7 @@ const debug = require('debug')('stubr');
 import logger from '../utils/logger';
 import * as path from 'path';
 import SwaggerParser from '@apidevtools/swagger-parser';
-import type { OpenAPI } from 'openapi-types';
+import type { OpenAPI, OpenAPIV3 } from 'openapi-types';
 import { parseSpecAsScenarios } from './parse-to-scenario';
 
 const parseSwaggerSpecs = (
@@ -22,7 +22,22 @@ const parseSwaggerSpecs = (
                         swaggerSpecObjectsOrPath
                     );
 
-                    const result: Scenario[] = await parseSpecAsScenarios(api);
+                    // check if it is OpenApi v3
+                    const openApiMajorVersion = parseInt(
+                        (api as OpenAPIV3.Document)?.openapi?.split('.')?.[0]
+                    );
+                    if (openApiMajorVersion < 3) {
+                        errors.push(
+                            `unsupported OpenAPI version specs provided at path "${path.resolve(
+                                swaggerSpecObjectsOrPath
+                            )}"`
+                        );
+                        return;
+                    }
+
+                    const result: Scenario[] = await parseSpecAsScenarios(
+                        api as OpenAPIV3.Document
+                    );
 
                     result.forEach((scenario: Scenario) => {
                         scenarios.push(scenario);
