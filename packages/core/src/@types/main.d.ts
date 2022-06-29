@@ -36,17 +36,20 @@ interface Config {
     swaggerSpecs?: {
         specPaths: string[];
         strictMode?: boolean;
+        autoMockDisabled?: boolean;
     };
 }
 
 interface Scenario {
+    source?: 'openapi' | 'custom';
     id?: string;
     name: string;
     route: string;
     method: Method;
     group?: string;
     delay?: number;
-    validationRules?: ValidateRules;
+    apiSchema?: ApiSchema;
+    validationRules?: RuleGroup;
     validate?:
         | boolean
         | ((headers: object, body: object, params: object) => boolean);
@@ -76,32 +79,38 @@ type AttributeType =
     | 'integer'
     | 'array';
 
+type AttributeRegionName = 'headers' | 'parameters' | 'body';
+
 type RuleGroup = {
     groupType: 'OR' | 'AND';
     items: (RuleObject | RuleGroup)[];
 };
 
 type RuleObject = {
+    attributeRegionName: AttributeRegionName;
     attributeName: string;
     attributeType: AttributeType;
-} & (
-    | {
-          type: 'GT' | 'GTEQ' | 'LT' | 'LTEQ';
-          value: any;
-      }
-    | {
-          type: 'ENUM';
-          enum?: Array<any>;
-      }
-    | {
-          mandatory: boolean;
-      }
-);
+    type: 'GT' | 'GTEQ' | 'LT' | 'LTEQ';
+    value: any;
+};
 
-interface ValidateRules {
-    headers?: RuleGroup | RuleObject[];
-    params?: RuleGroup | RuleObject[];
-    body?: RuleGroup | RuleObject[];
+type ParameterIn = 'query' | 'path';
+
+type ParameterSchema = {
+    in: ParameterIn;
+    name: string;
+    required?: boolean;
+    schema: any;
+};
+
+type BodySchema = {
+    schema: any;
+};
+
+interface ApiSchema {
+    parameters?: ParameterSchema[];
+    requestBody?: BodySchema;
+    responseBody?: BodySchema;
 }
 
 interface LogEntry {

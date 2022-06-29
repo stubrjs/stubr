@@ -7,6 +7,7 @@ declare class Stubr {
         swaggerSpecs?: {
             specPaths: string[];
             strictMode?: boolean;
+            autoMockDisabled?: boolean;
         };
     });
 

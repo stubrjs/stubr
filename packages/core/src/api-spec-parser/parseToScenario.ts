@@ -1,7 +1,7 @@
 import type { OpenAPIV3 } from 'openapi-types';
-import { type } from 'os';
 import { Method } from '../@types/enums';
-import { extractExample } from './extract-example';
+import { extractExample } from './extractExample';
+import { extractSchema } from './extractSchema';
 
 const parseSpecAsScenarios = (api: OpenAPIV3.Document): Promise<Scenario[]> =>
     new Promise((resolve) => {
@@ -9,10 +9,6 @@ const parseSpecAsScenarios = (api: OpenAPIV3.Document): Promise<Scenario[]> =>
 
         Object.keys(api.paths || []).forEach((path: string) => {
             const apiMethods: string[] = Object.keys(api.paths?.[path] || {});
-            /*
-                .map((method) => method.toUpperCase() as Method)
-                .filter((method) => Object.values(Method).includes(method));
-                */
 
             apiMethods.forEach((apiMethod: string) => {
                 const castedMethod: Method = apiMethod.toUpperCase() as Method;
@@ -57,16 +53,23 @@ const parseSpecAsScenarios = (api: OpenAPIV3.Document): Promise<Scenario[]> =>
                             const example: any =
                                 extractExample(mediaTypeObject);
 
+                            const apiSchema: ApiSchema = extractSchema(
+                                operationObject,
+                                responseObject,
+                                mediaType
+                            );
+
                             scenarios.push({
+                                source: 'openapi',
                                 group: `${api.info.title}`,
                                 name: `${operationObject?.operationId} - ${code}`,
                                 route: path,
                                 method: castedMethod,
-                                validationRules: {},
+                                responseCode: parseInt(code),
+                                apiSchema: apiSchema,
                                 responseHeaders: {
                                     'Content-Type': mediaType,
                                 },
-                                responseCode: parseInt(code),
                                 responseBody: example,
                             });
                         });
@@ -74,8 +77,6 @@ const parseSpecAsScenarios = (api: OpenAPIV3.Document): Promise<Scenario[]> =>
                 );
             });
         });
-
-        console.log(scenarios);
 
         resolve(scenarios);
     });

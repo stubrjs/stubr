@@ -15,6 +15,7 @@ const enhanceScenario = (scenario: Scenario): Scenario => {
     }
 
     return {
+        source: 'custom',
         ...scenario,
         id: scenario.id ? scenario.id : nanoid(),
         responseFilePath: scenario.responseFilePath

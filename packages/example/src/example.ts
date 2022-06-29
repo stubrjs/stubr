@@ -4,6 +4,7 @@ import { Method } from 'stubr';
 const stubr = new Stubr({
     swaggerSpecs: {
         specPaths: ['./src/specs/example.yaml'],
+        autoMockDisabled: true,
     },
 });
 

@@ -3,7 +3,7 @@ import logger from '../utils/logger';
 import * as path from 'path';
 import SwaggerParser from '@apidevtools/swagger-parser';
 import type { OpenAPI, OpenAPIV3 } from 'openapi-types';
-import { parseSpecAsScenarios } from './parse-to-scenario';
+import { parseSpecAsScenarios } from './parseToScenario';
 
 const parseSwaggerSpecs = (
     swaggerSpecObjectsOrPaths: string[]
@@ -35,11 +35,10 @@ const parseSwaggerSpecs = (
                         return;
                     }
 
-                    const result: Scenario[] = await parseSpecAsScenarios(
-                        api as OpenAPIV3.Document
-                    );
+                    const parsedScenarios: Scenario[] =
+                        await parseSpecAsScenarios(api as OpenAPIV3.Document);
 
-                    result.forEach((scenario: Scenario) => {
+                    parsedScenarios.forEach((scenario: Scenario) => {
                         scenarios.push(scenario);
                     });
                 } catch (err) {

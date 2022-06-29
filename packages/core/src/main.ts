@@ -210,6 +210,11 @@ class Stubr implements IStubr {
 
             let specParserResult: SpecParserResult;
 
+            // output no. of registered route configurations
+            signale.success(
+                `${this.scenarios?.length} custom scenarios registered`
+            );
+
             try {
                 if (this.stubrConfig.swaggerSpecs) {
                     const spinner = ora('parsing specs').start();
@@ -227,17 +232,18 @@ class Stubr implements IStubr {
                         throw new Error('parsing specs failed');
                     }
 
-                    if (specParserResult.scenarios?.length > 0) {
+                    if (
+                        specParserResult.scenarios?.length > 0 &&
+                        !this.stubrConfig.swaggerSpecs.autoMockDisabled
+                    ) {
                         signale.success(
-                            `${specParserResult.scenarios?.length} scenarios parsed from specs`
+                            `${specParserResult.scenarios?.length} auto mocked scenarios registered`
                         );
+                        specParserResult.scenarios?.forEach((scenario) => {
+                            this.scenarios.push(scenario);
+                        });
                     }
                 }
-
-                // output no. of registered route configurations
-                signale.success(
-                    `${this.scenarios?.length} scenarios registered`
-                );
 
                 // version
                 this.mockServer.use(
